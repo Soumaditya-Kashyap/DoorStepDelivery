@@ -32,7 +32,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.xamtech.doorstep"
+    namespace = "com.xamtech.purnima"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -48,9 +48,9 @@ android {
     }
 
     defaultConfig {
-        namespace = "com.xamtech.doorstep"
+        namespace = "com.xamtech.purnima"
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.xamtech.doorstep"
+        applicationId = "com.xamtech.purnima"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         compileSdkVersion 35

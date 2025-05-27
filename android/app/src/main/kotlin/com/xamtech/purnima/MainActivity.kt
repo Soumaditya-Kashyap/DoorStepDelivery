@@ -1,4 +1,4 @@
-package com.xamtech.doorstep
+package com.xamtech.purnima
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity
