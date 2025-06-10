@@ -321,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       //       );
       //     },
       //     "isResetLabel": true,
-      //   },
+      //   }
       if (Constant.session.isUserLoggedIn())
         {
           "icon": "settings",
