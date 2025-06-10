@@ -78,6 +78,7 @@ class AppUpdateScreen extends StatelessWidget {
                     },
                   ),
                 ),
+                
                 if (canIgnoreUpdate == false)
                   GestureDetector(
                     onTap: () {
