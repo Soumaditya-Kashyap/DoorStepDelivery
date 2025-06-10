@@ -29,41 +29,106 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: getAppBar(
-        context: context,
-        centerTitle: true,
-        title: CustomTextLabel(
-          jsonKey: "profile",
-          softWrap: true,
-          style: TextStyle(color: ColorsRes.mainTextColor),
-        ),
-        showBackButton: false,
-      ),
       body: Consumer<UserProfileProvider>(
         builder: (context, userProfileProvider, _) {
           setProfileMenuList();
-          return ListView(
+          return CustomScrollView(
             controller: widget.scrollController,
-            children: [
-              ProfileHeader(),
-              QuickUseWidget(),
-              menuItemsContainer(
-                title: "personal_data",
-                menuItem: personalDataMenu,
-              ),
-              menuItemsContainer(
-                title: "settings",
-                menuItem: settingsMenu,
-              ),
-              menuItemsContainer(
-                title: "other_information",
-                menuItem: otherInformationMenu,
-              ),
-              menuItemsContainer(
-                title: "",
-                menuItem: deleteMenuItem,
-                fontColor: ColorsRes.appColorRed,
-                iconColor: ColorsRes.appColorRed,
+            physics: ClampingScrollPhysics(), // Prevents overscroll bounce
+            slivers: [
+              // Modern SliverAppBar with enhanced gradient
+              SliverAppBar(
+                expandedHeight:
+                    200, // Increased for better proportions with new header
+                floating: false,
+                pinned: true,
+                automaticallyImplyLeading: false,
+                stretch: false, // Disable stretch to prevent scroll jump
+                clipBehavior: Clip.none, // Prevent clipping issues
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorsRes.gradient1,
+                          ColorsRes.gradient2,
+                          ColorsRes.appColorDark,
+                        ],
+                        stops: [0.0, 0.6, 1.0],
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: ProfileHeader(),
+                    ),
+                  ),
+                ),
+                backgroundColor: ColorsRes.gradient2,
+                title: CustomTextLabel(
+                  jsonKey: "",
+                  style: TextStyle(
+                    color: ColorsRes.appColorWhite,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                centerTitle: true,
+              ), // Content with modern design
+              SliverToBoxAdapter(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      getSizedBox(height: 20), // Proper top spacing
+                      QuickUseWidget(),
+                      getSizedBox(
+                          height: 16), // Consistent spacing between sections
+                      menuItemsContainer(
+                        title: "personal_data",
+                        menuItem: personalDataMenu,
+                      ),
+                      getSizedBox(
+                          height: 8), // Consistent spacing between cards
+                      menuItemsContainer(
+                        title: "settings",
+                        menuItem: settingsMenu,
+                      ),
+                      getSizedBox(
+                          height: 8), // Consistent spacing between cards
+                      menuItemsContainer(
+                        title: "other_information",
+                        menuItem: otherInformationMenu,
+                      ),
+                      if (deleteMenuItem.isNotEmpty) ...[
+                        getSizedBox(height: 8), // Consistent spacing
+                        menuItemsContainer(
+                          title: "",
+                          menuItem: deleteMenuItem,
+                          fontColor: ColorsRes.appColorRed,
+                          iconColor: ColorsRes.appColorRed,
+                        ),
+                      ],
+                      // Extra bottom padding to ensure all content is accessible above nav bar
+                      getSizedBox(
+                          height:
+                              80), // Increased padding for nav bar clearance
+                      // Additional safe area for different device sizes
+                      SafeArea(
+                        top: false,
+                        child:
+                            getSizedBox(height: 10), // Additional safe padding
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           );
@@ -85,15 +150,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "label": "my_wallet",
           "value": Consumer<SessionManager>(
             builder: (context, sessionManager, child) {
-              return CustomTextLabel(
-                text:
-                    "${sessionManager.getData(SessionManager.keyWalletBalance)}"
-                        .currency,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 17,
-                  color: ColorsRes.mainTextColor,
-                  fontWeight: FontWeight.w600,
+              return Container(
+                padding: EdgeInsetsDirectional.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      ColorsRes.appColor.withValues(alpha: 0.1),
+                      ColorsRes.gradient1.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: ColorsRes.appColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet,
+                      size: 16,
+                      color: ColorsRes.appColor,
+                    ),
+                    getSizedBox(width: 8),
+                    CustomTextLabel(
+                      text:
+                          "${sessionManager.getData(SessionManager.keyWalletBalance)}"
+                              .currency,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: ColorsRes.appColor,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -167,27 +263,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
         "isResetLabel": true,
       },
-      // if (context.read<LanguageProvider>().languages.length > 1)
-      //   {
-      //     "icon": "translate_icon",
-      //     "label": "change_language",
-      //     "clickFunction": (context) {
-      //       showModalBottomSheet<void>(
-      //         context: context,
-      //         isScrollControlled: true,
-      //         shape: DesignConfig.setRoundedBorderSpecific(20, istop: true),
-      //         backgroundColor: Theme.of(context).cardColor,
-      //         builder: (BuildContext context) {
-      //           return Wrap(
-      //             children: [
-      //               BottomSheetLanguageListContainer(),
-      //             ],
-      //           );
-      //         },
-      //       );
-      //     },
-      //     "isResetLabel": true,
-      //   },
       if (Constant.session.isUserLoggedIn())
         {
           "icon": "settings",
@@ -201,13 +276,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ];
 
     otherInformationMenu = [
-/*      if (isUserLogin)
-        {
-          "icon": "refer_friend_icon",
-          "label": "refer_and_earn",
-          "clickFunction": ReferAndEarn(),
-          "isResetLabel": false
-        },*/
       {
         "icon": "contact_icon",
         "label": "contact_us",
@@ -319,93 +387,188 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Color? iconColor,
     Color? fontColor,
   }) {
-    if (menuItem.isNotEmpty) {
-      return Container(
-        decoration: DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
-        padding: EdgeInsetsDirectional.only(start: 10, end: 10),
-        margin: EdgeInsetsDirectional.only(
-          start: 10,
-          end: 10,
-          bottom: 10,
-          top: Constant.session.isUserLoggedIn() ? 0 : 10,
+    if (menuItem.isEmpty) return SizedBox.shrink();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: ColorsRes.grey.withValues(alpha: 0.08),
+            spreadRadius: 0,
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+          BoxShadow(
+            color: ColorsRes.grey.withValues(alpha: 0.04),
+            spreadRadius: 0,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+        border: Border.all(
+          color: ColorsRes.grey.withValues(alpha: 0.1),
+          width: 0.5,
         ),
-        child: ListView(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          children: [
-            if (title.isNotEmpty) getSizedBox(height: 10),
-            if (title.isNotEmpty)
-              CustomTextLabel(
+      ),
+      margin: EdgeInsetsDirectional.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title section with perfect spacing
+          if (title.isNotEmpty) ...[
+            Padding(
+              padding: EdgeInsetsDirectional.symmetric(
+                horizontal: 20,
+                vertical: 16, // Symmetric vertical padding
+              ),
+              child: CustomTextLabel(
                 jsonKey: title,
                 style: TextStyle(
                   fontSize: 17,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: ColorsRes.mainTextColor,
+                  letterSpacing: 0.3,
+                  height: 1.2,
                 ),
               ),
-            if (title.isNotEmpty) getSizedBox(height: 10),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                menuItem.length,
-                (index) => Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        menuItem[index]['clickFunction'](context);
-                      },
-                      child: Padding(
-                        padding:
-                            EdgeInsetsDirectional.only(top: 10, bottom: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            defaultImg(
-                              image: menuItem[index]['icon'],
-                              iconColor: iconColor ?? ColorsRes.mainTextColor,
-                              height: 24,
-                              width: 24,
-                            ),
-                            getSizedBox(width: 15),
-                            Expanded(
-                              child: CustomTextLabel(
-                                jsonKey: menuItem[index]['label'],
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: fontColor ?? ColorsRes.mainTextColor,
-                                ),
-                              ),
-                            ),
-                            if (menuItem[index]['value'] != null)
-                              menuItem[index]['value'],
-                            if (menuItem[index]['value'] != null)
-                              getSizedBox(width: 10),
-                            Icon(
-                              Icons.navigate_next,
-                              color: fontColor ??
-                                  ColorsRes.mainTextColor
-                                      .withValues(alpha: 0.5),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (index != menuItem.length - 1)
-                      getDivider(
-                        height: 5,
-                        color: fontColor ??
-                            ColorsRes.mainTextColor.withValues(alpha: 0.1),
-                      ),
+            ),
+            // Divider after title
+            Container(
+              height: 1,
+              margin: EdgeInsetsDirectional.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    ColorsRes.mainTextColor.withValues(alpha: 0.1),
+                    Colors.transparent,
                   ],
                 ),
               ),
             ),
           ],
-        ),
-      );
-    } else {
-      return SizedBox.shrink();
-    }
+
+          // Menu items with perfect spacing
+          ListView.separated(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            itemCount: menuItem.length,
+            separatorBuilder: (context, index) => Container(
+              height: 1,
+              margin: EdgeInsetsDirectional.only(start: 76, end: 20),
+              color: ColorsRes.mainTextColor.withValues(alpha: 0.06),
+            ),
+            itemBuilder: (context, index) {
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    menuItem[index]['clickFunction'](context);
+                  },
+                  borderRadius: BorderRadius.circular(
+                    index == 0 && title.isNotEmpty
+                        ? 0
+                        : index == menuItem.length - 1
+                            ? 20
+                            : 0,
+                  ),
+                  child: Container(
+                    padding: EdgeInsetsDirectional.symmetric(
+                      horizontal: 20,
+                      vertical: 16, // Perfect symmetric padding
+                    ),
+                    child: Row(
+                      children: [
+                        // Icon container with modern design
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                (iconColor ?? ColorsRes.appColor)
+                                    .withValues(alpha: 0.12),
+                                (iconColor ?? ColorsRes.appColor)
+                                    .withValues(alpha: 0.08),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: (iconColor ?? ColorsRes.appColor)
+                                  .withValues(alpha: 0.15),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Center(
+                            child: defaultImg(
+                              image: menuItem[index]['icon'],
+                              iconColor: iconColor ?? ColorsRes.appColor,
+                              height: 22,
+                              width: 22,
+                            ),
+                          ),
+                        ),
+
+                        getSizedBox(width: 16), // Consistent spacing
+
+                        // Label section
+                        Expanded(
+                          child: CustomTextLabel(
+                            jsonKey: menuItem[index]['label'],
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: fontColor ?? ColorsRes.mainTextColor,
+                              letterSpacing: 0.2,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+
+                        // Value section (if exists)
+                        if (menuItem[index]['value'] != null) ...[
+                          menuItem[index]['value'],
+                          getSizedBox(width: 12),
+                        ],
+
+                        // Arrow button with modern design
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: (fontColor ?? ColorsRes.mainTextColor)
+                                .withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: (fontColor ?? ColorsRes.mainTextColor)
+                                  .withValues(alpha: 0.1),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 16,
+                            color: fontColor ??
+                                ColorsRes.mainTextColor.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Bottom spacing for perfect symmetry
+          if (title.isNotEmpty)
+            getSizedBox(
+                height: 4), // Small bottom padding for cards with titles
+        ],
+      ),
+    );
   }
 }

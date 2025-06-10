@@ -14,41 +14,54 @@ class QuickActionButtonWidget extends StatelessWidget {
       required this.onClickAction,
       required this.padding,
       required this.context});
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
-      child: Container(
-        decoration: DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
-        padding: const EdgeInsets.all(5),
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
-          splashColor: ColorsRes.appColorLightHalfTransparent,
-          highlightColor: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          splashColor: ColorsRes.appColor.withValues(alpha: 0.1),
+          highlightColor: ColorsRes.appColor.withValues(alpha: 0.05),
           onTap: () {
             onClickAction();
           },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              getSizedBox(
-                height: 8,
-              ),
-              icon ?? SizedBox.shrink(),
-              getSizedBox(
-                height: 8,
-              ),
-              CustomTextLabel(
-                jsonKey: label,
-                style: TextStyle(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: ColorsRes.grey.withValues(alpha: 0.1),
+                  spreadRadius: 1,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: EdgeInsetsDirectional.symmetric(
+              vertical: 16, // Reduced from 20
+              horizontal: 10, // Reduced from 12
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                icon ?? SizedBox.shrink(),
+                getSizedBox(height: 10), // Reduced from 12
+                CustomTextLabel(
+                  jsonKey: label,
+                  style: TextStyle(
                     color: ColorsRes.mainTextColor,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 17),
-              ),
-              getSizedBox(
-                height: 8,
-              ),
-            ],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13, // Reduced from 14
+                    letterSpacing: 0.2,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),
