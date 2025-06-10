@@ -572,4 +572,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-//Redisigned
