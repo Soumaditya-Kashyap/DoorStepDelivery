@@ -562,7 +562,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             },
           ),
-          // Bottom spacing for perfect symmetry
           if (title.isNotEmpty)
             getSizedBox(
                 height: 4), 
