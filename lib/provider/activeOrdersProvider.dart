@@ -9,6 +9,7 @@ enum ActiveOrdersState {
   error,
 }
 
+
 class ActiveOrdersProvider extends ChangeNotifier {
   ActiveOrdersState activeOrdersState = ActiveOrdersState.initial;
   String message = '';

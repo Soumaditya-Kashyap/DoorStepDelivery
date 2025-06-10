@@ -200,6 +200,7 @@ rm -rf ios/build/
 rm -rf ios/Podfile.lock
 rm -rf pubspec.lock
 rm -rf devtools_options.yaml
+
 rm -rf analysis_options.yaml
 rm -rf .flutter-plugins
 rm -rf .flutter-plugins-dependencies
