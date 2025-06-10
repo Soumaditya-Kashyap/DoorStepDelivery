@@ -8,7 +8,6 @@ enum AddressState {
   editing,
   error,
 }
-
 class AddressProvider extends ChangeNotifier {
   AddressState addressState = AddressState.initial;
   String message = '';
