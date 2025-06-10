@@ -527,7 +527,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
-
                         // Value section (if exists)
                         if (menuItem[index]['value'] != null) ...[
                           menuItem[index]['value'],
