@@ -12,5 +12,3 @@ Widget backgroundImageWidget() {
     ),
   );
 }
-
-
