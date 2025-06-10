@@ -565,7 +565,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Bottom spacing for perfect symmetry
           if (title.isNotEmpty)
             getSizedBox(
-                height: 4), // Small bottom padding for cards with titles
+                height: 4), 
         ],
       ),
     );
