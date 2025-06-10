@@ -9,6 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+
   // Initialize Firebase
   await Firebase.initializeApp();
 
