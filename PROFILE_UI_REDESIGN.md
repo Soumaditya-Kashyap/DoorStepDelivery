@@ -1,4 +1,4 @@
-# DrunkPanda App - Profile UI Complete Redesign
+# DrunkPanda App - Profile UI Complete Redesign 
 
 ## Overview
 The profile page has been completely redesigned with a modern, professional UI that addresses all the previous issues while maintaining functionality.
