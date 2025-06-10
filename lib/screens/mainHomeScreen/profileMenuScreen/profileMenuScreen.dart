@@ -533,7 +533,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           menuItem[index]['value'],
                           getSizedBox(width: 12),
                         ],
-
                         // Arrow button with modern design
                         Container(
                           width: 36,
