@@ -86,22 +86,72 @@ class _LoginAccountState extends State<LoginAccountScreen> {
         ? Container(
             height: 55,
             alignment: AlignmentDirectional.center,
-            child: CircularProgressIndicator(),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: ColorsRes.appColor.withOpacity(0.7),
+            ),
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2.5,
+            ),
           )
-        : gradientBtnWidget(
-            context,
-            10,
-            title: getTranslatedValue(
-              context,
-              "login",
-            ).toUpperCase(),
-            callback: () {
-              if (authProvider == AuthProviders.phone) {
-                loginWithPhoneNumber();
-              } else if (authProvider == AuthProviders.emailPassword) {
-                loginWithEmailIdPassword();
-              }
-            },
+        : Container(
+            height: 55,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  ColorsRes.appColor,
+                  ColorsRes.appColor.withOpacity(0.8),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: ColorsRes.appColor.withOpacity(0.4),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(15),
+                onTap: () {
+                  if (authProvider == AuthProviders.phone) {
+                    loginWithPhoneNumber();
+                  } else if (authProvider == AuthProviders.emailPassword) {
+                    loginWithEmailIdPassword();
+                  }
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        getTranslatedValue(context, "login").toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      getSizedBox(width: 10),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           );
   }
 
@@ -135,14 +185,21 @@ class _LoginAccountState extends State<LoginAccountScreen> {
     return Container(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       constraints: BoxConstraints(
-        maxHeight: context.height * 0.76,
+        maxHeight: context.height * 0.85,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+          topLeft: Radius.circular(35),
+          topRight: Radius.circular(35),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: Offset(0, -5),
+          ),
+        ],
       ),
       child: SingleChildScrollView(
         padding: EdgeInsetsDirectional.only(
@@ -151,45 +208,75 @@ class _LoginAccountState extends State<LoginAccountScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            getSizedBox(height: Constant.size20),
-            Padding(
-              padding: EdgeInsetsDirectional.only(start: 20, end: 20),
-              child: RichText(
-                textAlign: TextAlign.start,
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.titleSmall!.merge(
-                        TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                          fontSize: 30,
-                          color: ColorsRes.mainTextColor,
-                        ),
-                      ),
-                  text: "${getTranslatedValue(
-                    context,
-                    "welcome",
-                  )} ",
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: "\nDoorStep Delivery!",
-                      // text: "${getTranslatedValue(context, "app_name")}!",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                        fontSize: 30,
-                        color: ColorsRes.appColor,
-                      ),
-                    ),
+            getSizedBox(height: Constant.size25),
+            // Enhanced Welcome Header with Gradient
+            Container(
+              margin: EdgeInsetsDirectional.only(start: 20, end: 20),
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    ColorsRes.appColor.withOpacity(0.1),
+                    ColorsRes.appColor.withOpacity(0.05),
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: ColorsRes.appColor.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    textAlign: TextAlign.start,
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.titleSmall!.merge(
+                            TextStyle(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                              fontSize: 28,
+                              color: ColorsRes.mainTextColor,
+                            ),
+                          ),
+                      text: "${getTranslatedValue(
+                        context,
+                        "welcome",
+                      )} ",
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: "\nDrunkPanda!",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            fontSize: 32,
+                            color: ColorsRes.appColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  getSizedBox(height: 12),
+                  Text(
+                    "${getTranslatedValue(context, "login_message1")}",
+                    style: TextStyle(
+                      color: ColorsRes.subTitleMainTextColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
             ),
             if (Constant.authTypePhoneLogin == "1" ||
                 Constant.authTypeEmailLogin == "1") ...[
-              getSizedBox(height: Constant.size40),
+              getSizedBox(height: Constant.size30),
               AnimatedOpacity(
                 opacity: showMobileNumberWidget ? 1.0 : 0.0,
-                duration: Duration(milliseconds: 300),
+                duration: Duration(milliseconds: 400),
                 child: Visibility(
                   visible: showMobileNumberWidget,
                   child: Container(
@@ -200,7 +287,7 @@ class _LoginAccountState extends State<LoginAccountScreen> {
               ),
               AnimatedOpacity(
                 opacity: !showMobileNumberWidget ? 1.0 : 0.0,
-                duration: Duration(milliseconds: 300),
+                duration: Duration(milliseconds: 400),
                 child: Visibility(
                   visible: !showMobileNumberWidget,
                   child: Container(
@@ -209,60 +296,87 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                   ),
                 ),
               ),
-              getSizedBox(height: Constant.size20),
+              getSizedBox(height: Constant.size25),
+              // Enhanced Login Button
               Padding(
                 padding: EdgeInsetsDirectional.only(start: 20, end: 20),
-                child: proceedBtn(),
-              ),
-              getSizedBox(height: Constant.size20),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushNamed(
-                    editProfileScreen,
-                    arguments: [
-                      !showMobileNumberWidget
-                          ? "email_register"
-                          : "mobile_register",
-                      {
-                        ApiAndParams.type: "email",
-                        ApiAndParams.fcmToken: Constant.session
-                            .getData(SessionManager.keyFCMToken),
-                      }
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ColorsRes.appColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
                     ],
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    end: 20,
                   ),
+                  child: proceedBtn(),
+                ),
+              ),
+              getSizedBox(height: Constant.size25),
+              // Enhanced Register Link
+              Container(
+                margin: EdgeInsetsDirectional.only(start: 20, end: 20),
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: ColorsRes.subTitleMainTextColor.withOpacity(0.2),
+                  ),
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      editProfileScreen,
+                      arguments: [
+                        !showMobileNumberWidget
+                            ? "email_register"
+                            : "mobile_register",
+                        {
+                          ApiAndParams.type: "email",
+                          ApiAndParams.fcmToken: Constant.session
+                              .getData(SessionManager.keyFCMToken),
+                        }
+                      ],
+                    );
+                  },
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomTextLabel(
                         jsonKey: "dont_have_an_account",
                         style: TextStyle(
                           color: ColorsRes.subTitleMainTextColor,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
                         ),
                       ),
-                      getSizedBox(width: 5),
+                      getSizedBox(width: 8),
                       CustomTextLabel(
                         jsonKey: "wants_to_register",
                         style: TextStyle(
                           color: ColorsRes.appColor,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
                         ),
+                      ),
+                      getSizedBox(width: 5),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: ColorsRes.appColor,
+                        size: 18,
                       ),
                     ],
                   ),
                 ),
               ),
-              getSizedBox(height: Constant.size20),
+              getSizedBox(height: Constant.size25),
               if (Platform.isIOS && Constant.authTypeAppleLogin == "1" ||
                   Constant.authTypeGoogleLogin == "1")
                 buildDottedDivider(context),
-              getSizedBox(height: Constant.size20),
+              getSizedBox(height: Constant.size25),
             ],
             if (Platform.isIOS && Constant.authTypeAppleLogin == "1") ...[
               Padding(
@@ -443,18 +557,28 @@ class _LoginAccountState extends State<LoginAccountScreen> {
       children: [
         AnimatedOpacity(
           opacity: showMobileNumberWidget ? 1.0 : 0.0,
-          duration: Duration(milliseconds: 300),
+          duration: Duration(milliseconds: 400),
           child: Visibility(
             visible: showMobileNumberWidget,
             child: Container(
-              decoration: DesignConfig.boxDecoration(
-                  Theme.of(context).scaffoldBackgroundColor, 10,
-                  bordercolor: ColorsRes.subTitleMainTextColor,
-                  isboarder: true,
-                  borderwidth: 1.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: ColorsRes.appColor.withOpacity(0.3),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorsRes.appColor.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Row(
                 children: [
-                  getSizedBox(width: Constant.size5),
+                  getSizedBox(width: Constant.size10),
                   IgnorePointer(
                     ignoring: isLoading,
                     child: CountryCodePicker(
@@ -467,7 +591,10 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                       initialSelection: Constant.initialCountryCode,
                       textOverflow: TextOverflow.ellipsis,
                       backgroundColor: Theme.of(context).cardColor,
-                      textStyle: TextStyle(color: ColorsRes.mainTextColor),
+                      textStyle: TextStyle(
+                        color: ColorsRes.mainTextColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                       dialogBackgroundColor: Theme.of(context).cardColor,
                       dialogSize: Size(context.width, context.height),
                       barrierColor: ColorsRes.subTitleMainTextColor,
@@ -476,24 +603,23 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                         iconColor: ColorsRes.subTitleMainTextColor,
                         fillColor: Theme.of(context).cardColor,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(15),
                           borderSide: BorderSide(
-                              color: ColorsRes.subTitleMainTextColor),
+                              color: ColorsRes.appColor.withOpacity(0.3)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(15),
                           borderSide: BorderSide(
-                              color: ColorsRes.subTitleMainTextColor),
+                              color: ColorsRes.appColor.withOpacity(0.3)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                              color: ColorsRes.subTitleMainTextColor),
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(color: ColorsRes.appColor),
                         ),
                         focusColor: Theme.of(context).scaffoldBackgroundColor,
                         prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: ColorsRes.subTitleMainTextColor,
+                          color: ColorsRes.appColor,
                         ),
                       ),
                       searchStyle: TextStyle(
@@ -506,7 +632,7 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                   ),
                   Icon(
                     Icons.keyboard_arrow_down,
-                    color: ColorsRes.grey,
+                    color: ColorsRes.appColor,
                     size: 15,
                   ),
                   getSizedBox(width: Constant.size10),
@@ -519,18 +645,23 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                       ],
                       style: TextStyle(
                         color: ColorsRes.mainTextColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 15),
                         hintStyle: TextStyle(
-                          color: ColorsRes.grey.withValues(alpha: 0.8),
+                          color: ColorsRes.grey.withOpacity(0.7),
+                          fontSize: 16,
                         ),
                         hintText:
                             getTranslatedValue(context, "phone_number_hint"),
                       ),
                     ),
-                  )
+                  ),
+                  getSizedBox(width: Constant.size15),
                 ],
               ),
             ),

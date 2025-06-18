@@ -101,25 +101,87 @@ class _EditProfileState extends State<EditProfile> {
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(
-            horizontal: Constant.size10, vertical: Constant.size15),
+            horizontal: Constant.size15, vertical: Constant.size20),
         children: [
-          imgWidget(),
+          // Enhanced Profile Image Section
           Container(
-            decoration:
-                DesignConfig.boxDecoration(Theme.of(context).cardColor, 10),
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.only(top: 20),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: Constant.size10, vertical: Constant.size15),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  userInfoWidget(),
-                  const SizedBox(height: 50),
-                  proceedBtn()
-                ],
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: imgWidget(),
+          ),
+          SizedBox(height: 20),
+          // Enhanced Form Section
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+              border: Border.all(
+                color: ColorsRes.appColor.withOpacity(0.1),
+                width: 1,
               ),
+            ),
+            padding: EdgeInsets.all(25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        ColorsRes.appColor.withOpacity(0.1),
+                        ColorsRes.appColor.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.person_add_rounded,
+                        color: ColorsRes.appColor,
+                        size: 24,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        (widget.from == "register" ||
+                                widget.from == "email_register")
+                            ? getTranslatedValue(context, "register")
+                            : getTranslatedValue(context, "edit_profile"),
+                        style: TextStyle(
+                          color: ColorsRes.mainTextColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 25),
+                userInfoWidget(),
+                SizedBox(height: 30),
+                proceedBtn(),
+              ],
             ),
           ),
         ],
@@ -130,75 +192,95 @@ class _EditProfileState extends State<EditProfile> {
   firebaseLoginProcess() async {
     setState(() {});
     if (editMobileTextEditingController.text.isNotEmpty) {
-        if (context.read<AppSettingsProvider>().settingsData!.firebaseAuthentication == "1") {
-          await firebaseAuth.verifyPhoneNumber(
-            timeout: Duration(minutes: 1, seconds: 30),
-            phoneNumber: '${selectedCountryCode!.dialCode}${editMobileTextEditingController.text}',
-            verificationCompleted: (PhoneAuthCredential credential) {},
-            verificationFailed: (FirebaseAuthException e) {
-              showMessage(
-                context,
-                e.message!,
-                MessageType.warning,
-              );
+      if (context
+              .read<AppSettingsProvider>()
+              .settingsData!
+              .firebaseAuthentication ==
+          "1") {
+        await firebaseAuth.verifyPhoneNumber(
+          timeout: Duration(minutes: 1, seconds: 30),
+          phoneNumber:
+              '${selectedCountryCode!.dialCode}${editMobileTextEditingController.text}',
+          verificationCompleted: (PhoneAuthCredential credential) {},
+          verificationFailed: (FirebaseAuthException e) {
+            showMessage(
+              context,
+              e.message!,
+              MessageType.warning,
+            );
 
+            setState(() {
+              isLoading = false;
+            });
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            forceResendingToken = resendToken;
+            isLoading = false;
+            setState(() {
+              otpVerificationId = verificationId;
+            });
+            ToggleComponentsWidget(true);
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {
+            if (mounted) {
               setState(() {
                 isLoading = false;
               });
-            },
-            codeSent: (String verificationId, int? resendToken) {
-              forceResendingToken = resendToken;
-              isLoading = false;
-              setState(() {
-                otpVerificationId = verificationId;
-              });
+            }
+          },
+          forceResendingToken: forceResendingToken,
+        );
+      } else if (Constant.customSmsGatewayOtpBased == "1") {
+        context.read<UserProfileProvider>().sendCustomOTPSmsProvider(
+          context: context,
+          params: {
+            ApiAndParams.phone:
+                "$selectedCountryCode${editMobileTextEditingController.text}"
+          },
+        ).then(
+          (value) {
+            if (value == "1") {
               ToggleComponentsWidget(true);
-            },
-            codeAutoRetrievalTimeout: (String verificationId) {
-              if (mounted) {
-                setState(() {
-                  isLoading = false;
-                });
-              }
-            },
-            forceResendingToken: forceResendingToken,
-          );
-        } else if (Constant.customSmsGatewayOtpBased == "1") {
-          context.read<UserProfileProvider>().sendCustomOTPSmsProvider(
-            context: context,
-            params: {ApiAndParams.phone: "$selectedCountryCode${editMobileTextEditingController.text}"},
-          ).then(
-            (value) {
-              if (value == "1") {
-                ToggleComponentsWidget(true);
-              } else {
-                setState(() {
-                  isLoading = false;
-                });
-                showMessage(
+            } else {
+              setState(() {
+                isLoading = false;
+              });
+              showMessage(
+                context,
+                getTranslatedValue(
                   context,
-                  getTranslatedValue(
-                    context,
-                    "custom_send_sms_error_message",
-                  ),
-                  MessageType.warning,
-                );
-              }
-            },
-          );
-        }
+                  "custom_send_sms_error_message",
+                ),
+                MessageType.warning,
+              );
+            }
+          },
+        );
       }
+    }
   }
 
   Future verifyOtp() async {
-    if (context.read<AppSettingsProvider>().settingsData!.firebaseAuthentication == "1") {
+    if (context
+            .read<AppSettingsProvider>()
+            .settingsData!
+            .firebaseAuthentication ==
+        "1") {
       isLoading = true;
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: resendOtpVerificationId.isNotEmpty ? resendOtpVerificationId : otpVerificationId, smsCode: pinController.text);
+          verificationId: resendOtpVerificationId.isNotEmpty
+              ? resendOtpVerificationId
+              : otpVerificationId,
+          smsCode: pinController.text);
 
       firebaseAuth.signInWithCredential(credential).then((value) {
-        print("register-----2-----${selectedCountryCode!.dialCode.toString()}--${widget.from}");
-        context.read<UserProfileProvider>().registerAccountApi(context: context, params: widget.loginParams ?? {}).then(
+        print(
+            "register-----2-----${selectedCountryCode!.dialCode.toString()}--${widget.from}");
+        context
+            .read<UserProfileProvider>()
+            .registerAccountApi(
+                context: context, params: widget.loginParams ?? {})
+            .then(
           (value) {
             if (value == "1") {
               ToggleComponentsWidget(true);
@@ -220,7 +302,9 @@ class _EditProfileState extends State<EditProfile> {
         // return false;
       });
     } else if (Constant.customSmsGatewayOtpBased == "1") {
-      await context.read<UserProfileProvider>().verifyUserProvider(context: context, params: {
+      await context
+          .read<UserProfileProvider>()
+          .verifyUserProvider(context: context, params: {
         ApiAndParams.otp: pinController.text,
         ApiAndParams.phone: editMobileTextEditingController.text,
         ApiAndParams.countryCode: selectedCountryCode!.dialCode.toString(),
@@ -229,7 +313,11 @@ class _EditProfileState extends State<EditProfile> {
         if (value["status"].toString() == "1") {
           print("here:${value["message"] == "otp_valid_but_user_not_found"}");
           if (value["message"] == "otp_valid_but_user_not_found") {
-            context.read<UserProfileProvider>().registerAccountApi(context: context, params: widget.loginParams ?? {}).then(
+            context
+                .read<UserProfileProvider>()
+                .registerAccountApi(
+                    context: context, params: widget.loginParams ?? {})
+                .then(
               (value) {
                 if (value == "1") {
                   // ToggleComponentsWidget(true);
@@ -264,7 +352,10 @@ class _EditProfileState extends State<EditProfile> {
       ApiAndParams.countryCode: selectedCountryCode!.dialCode.toString(),
     };
 
-    await context.read<UserProfileProvider>().verifyUserProvider(context: context, params: params).then((value) async {
+    await context
+        .read<UserProfileProvider>()
+        .verifyUserProvider(context: context, params: params)
+        .then((value) async {
       if (value[ApiAndParams.status].toString() == "1") {
         return true;
       } else {
@@ -286,7 +377,8 @@ class _EditProfileState extends State<EditProfile> {
                   (!showOtpWidget && widget.from == "email_register")
                       ? "send_otp"
                       : (widget.from == "register_header" ||
-                              widget.from == "email_register" || widget.from == "mobile_register")
+                              widget.from == "email_register" ||
+                              widget.from == "mobile_register")
                           ? "register"
                           : "update",
                 ),
@@ -324,12 +416,14 @@ class _EditProfileState extends State<EditProfile> {
                               editMobileTextEditingController.text.trim();
                         }
 
-                        if (widget.from == "email_register" || widget.from == "mobile_register") {
+                        if (widget.from == "email_register" ||
+                            widget.from == "mobile_register") {
                           widget.loginParams?[ApiAndParams.password] =
                               editPasswordTextEditingController.text.trim();
                         }
                         if (widget.from == "email_register" && !showOtpWidget) {
-                          print("register-----3-----${selectedCountryCode!.dialCode.toString()}--${widget.from}");
+                          print(
+                              "register-----3-----${selectedCountryCode!.dialCode.toString()}--${widget.from}");
                           userProfileProvider
                               .registerAccountApi(
                                   context: context,
@@ -341,15 +435,22 @@ class _EditProfileState extends State<EditProfile> {
                               }
                             },
                           );
-                        } else if (widget.from == "mobile_register" && !showOtpWidget) {
+                        } else if (widget.from == "mobile_register" &&
+                            !showOtpWidget) {
                           firebaseLoginProcess().then(
                             (value) {
                               // ToggleComponentsWidget(true);
                             },
                           );
-                        }  else if (widget.from == "mobile_register" && showOtpWidget) {
-                          widget.loginParams?[ApiAndParams.type] = widget.from == "mobile_register"?"phone": "email";
-                          widget.loginParams?[ApiAndParams.fcmToken] = Constant.session.getData(SessionManager.keyFCMToken);
+                        } else if (widget.from == "mobile_register" &&
+                            showOtpWidget) {
+                          widget.loginParams?[ApiAndParams.type] =
+                              widget.from == "mobile_register"
+                                  ? "phone"
+                                  : "email";
+                          widget.loginParams?[ApiAndParams.fcmToken] = Constant
+                              .session
+                              .getData(SessionManager.keyFCMToken);
                           verifyOtp();
                         } else if (widget.from == "email_register" &&
                             showOtpWidget) {
@@ -379,7 +480,8 @@ class _EditProfileState extends State<EditProfile> {
                         } else if (widget.from == "register" ||
                             widget.from == "register_header" ||
                             widget.from == "add_to_cart_register") {
-                              widget.loginParams?[ApiAndParams.countryCode] = selectedCountryCode!.dialCode.toString();
+                          widget.loginParams?[ApiAndParams.countryCode] =
+                              selectedCountryCode!.dialCode.toString();
                           userProfileProvider
                               .registerAccountApi(
                                   context: context,
@@ -641,7 +743,9 @@ class _EditProfileState extends State<EditProfile> {
           editBoxWidget(
             context,
             editEmailTextEditingController,
-            widget.from=="mobile_register"? (value) => null :emailValidation,
+            widget.from == "mobile_register"
+                ? (value) => null
+                : emailValidation,
             getTranslatedValue(
               context,
               "email",
@@ -655,7 +759,9 @@ class _EditProfileState extends State<EditProfile> {
           ),
           SizedBox(height: Constant.size15),
           mobileNoWidget(),
-          if (widget.from == "email_register" || widget.from == "mobile_register"/*  || widget.from == "register" */) ...[
+          if (widget.from == "email_register" ||
+              widget.from ==
+                  "mobile_register" /*  || widget.from == "register" */) ...[
             SizedBox(height: Constant.size15),
             ChangeNotifierProvider<PasswordShowHideProvider>(
               create: (context) => PasswordShowHideProvider(),
@@ -875,7 +981,7 @@ class _EditProfileState extends State<EditProfile> {
 
       String? emailValidate = await emailValidation(
         editEmailTextEditingController.text,
-      )/* ??"" */;
+      ) /* ??"" */;
 
       String? passwordValidate = await emptyValidation(
         editPasswordTextEditingController.text,
@@ -959,28 +1065,27 @@ class _EditProfileState extends State<EditProfile> {
             child: ClipRRect(
               borderRadius: Constant.borderRadius10,
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child:
-                  (widget.from == "email_register")
+              child: (widget.from == "email_register")
+                  ? setNetworkImg(
+                      height: 100,
+                      width: 100,
+                      boxFit: BoxFit.cover,
+                      image: "",
+                    )
+                  : selectedImagePath.isEmpty
                       ? setNetworkImg(
                           height: 100,
                           width: 100,
                           boxFit: BoxFit.cover,
-                          image: "",
+                          image: Constant.session
+                              .getData(SessionManager.keyUserImage),
                         )
-                      : selectedImagePath.isEmpty
-                          ? setNetworkImg(
-                              height: 100,
-                              width: 100,
-                              boxFit: BoxFit.cover,
-                              image: Constant.session
-                                  .getData(SessionManager.keyUserImage),
-                            )
-                          : Image.file(
-                              File(selectedImagePath),
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
+                      : Image.file(
+                          File(selectedImagePath),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
             ),
           ),
           if (widget.from != "register")
