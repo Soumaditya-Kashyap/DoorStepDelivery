@@ -91,33 +91,60 @@ Widget setNetworkImg({
   }
 
   return image.trim().isEmpty
-      ? defaultImg(
-          image: "placeholder",
-          height: height,
-          width: width,
-          boxFit: boxFit,
-        )
-      : Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(image),
-              fit: boxFit,
-            ),
-          ),
+      ? _buildShimmerPlaceholder(height, width, borderRadius)
+      : ClipRRect(
+          borderRadius: borderRadius ?? BorderRadius.circular(8),
           child: CachedNetworkImage(
             imageUrl: image,
             height: height,
             width: width,
-            fit: boxFit,
-            placeholder: (context, url) => defaultImg(
-              image: "placeholder",
-              boxFit: boxFit,
-            ),
+            fit: boxFit ?? BoxFit.cover,
+            placeholder: (context, url) =>
+                _buildShimmerPlaceholder(height, width, borderRadius),
+            errorWidget: (context, url, error) =>
+                _buildErrorPlaceholder(height, width, borderRadius),
+            fadeInDuration: Duration(milliseconds: 300),
+            fadeOutDuration: Duration(milliseconds: 100),
           ),
         );
+}
+
+Widget _buildShimmerPlaceholder(
+    double? height, double? width, BorderRadius? borderRadius) {
+  return Container(
+    height: height,
+    width: width,
+    decoration: BoxDecoration(
+      borderRadius: borderRadius ?? BorderRadius.circular(8),
+    ),
+    child: Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: borderRadius ?? BorderRadius.circular(8),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _buildErrorPlaceholder(
+    double? height, double? width, BorderRadius? borderRadius) {
+  return Container(
+    height: height,
+    width: width,
+    decoration: BoxDecoration(
+      color: Colors.grey[200],
+      borderRadius: borderRadius ?? BorderRadius.circular(8),
+    ),
+    child: Icon(
+      Icons.image_not_supported_outlined,
+      color: Colors.grey[400],
+      size: height != null ? height * 0.3 : 40,
+    ),
+  );
 }
 
 Widget defaultImg({
@@ -403,134 +430,50 @@ Widget getSearchWidget({
       Navigator.pushNamed(context, productSearchScreen);
     },
     child: Container(
-      color: Theme.of(context).cardColor,
-      padding: const EdgeInsetsDirectional.only(
-        start: 10,
-        end: 10,
-        bottom: 10,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: DesignConfig.boxDecoration(
-                  Theme.of(context).scaffoldBackgroundColor, 10),
-              child: ListTile(
-                dense: true,
-                title: TextField(
-                  enabled: false,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                    hintText:
-                        getTranslatedValue(context, "product_search_hint"),
-                    hintStyle: TextStyle(
-                      color: ColorsRes.subTitleMainTextColor,
-                    ),
-                    iconColor: ColorsRes.subTitleMainTextColor,
-                  ),
+      margin: EdgeInsets.all(0),
+      padding: EdgeInsets.all(0),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorsRes.subTitleMainTextColor.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search_rounded,
+              color: ColorsRes.subTitleMainTextColor,
+              size: 20,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                getTranslatedValue(context, "product_search_hint"),
+                style: TextStyle(
+                  color: ColorsRes.subTitleMainTextColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
-                horizontalTitleGap: 0,
-                contentPadding: EdgeInsets.zero,
-                leading: IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    Icons.search,
-                    color: ColorsRes.subTitleMainTextColor,
-                  ),
-                  onPressed: null,
-                ),
-                // trailing: Padding(
-                //   padding: const EdgeInsetsDirectional.only(end: 10),
-                //   child: defaultImg(
-                //     image: "voice_search_icon",
-                //     height: 24,
-                //     iconColor: ColorsRes.subTitleMainTextColor,
-                //     width: 24,
-                //   ),
-                // ),
               ),
             ),
-          ),
-          // SizedBox(width: Constant.size10),
-          // ChangeNotifierProvider<ProductDetailProvider>(
-          //   create: (context) => ProductDetailProvider(),
-          //   builder: (context, child) {
-          //     return GestureDetector(
-          //       onTap: () async {
-          //         print("Tapped");
-          //         await hasCameraPermissionGiven(context).then(
-          //           (value) async {
-          //             if (value.isGranted) {
-          //               Navigator.pushNamed(context, barCodeScanner).then(
-          //                 (value) {
-          //                   if (value != "-1" && value != null) {
-          //                     Navigator.pushNamed(
-          //                       context,
-          //                       productDetailScreen,
-          //                       arguments: [
-          //                         value.toString(),
-          //                         getTranslatedValue(navigatorKey.currentContext!, "app_name"),
-          //                         null,
-          //                         "barcode",
-          //                       ],
-          //                     );
-          //                   }
-          //                 },
-          //               );
-          //               /*
-          //                 if (value != "-1") {
-          //                   Navigator.pushNamed(
-          //                     context,
-          //                     productDetailScreen,
-          //                     arguments: [
-          //                       value.toString(),
-          //                       getTranslatedValue(
-          //                           navigatorKey.currentContext!,
-          //                           "app_name"),
-          //                       null,
-          //                       "barcode",
-          //                     ],
-          //                   );
-          //                 }
-          //               */
-          //             } else if (value.isDenied) {
-          //               await Permission.camera.request();
-          //             } else if (value.isPermanentlyDenied) {
-          //               if (!Constant.session.getBoolData(SessionManager.keyPermissionCameraHidePromptPermanently)) {
-          //                 showModalBottomSheet(
-          //                   context: context,
-          //                   builder: (context) {
-          //                     return Wrap(
-          //                       children: [
-          //                         PermissionHandlerBottomSheet(
-          //                           titleJsonKey: "camera_permission_title",
-          //                           messageJsonKey: "camera_permission_message",
-          //                           sessionKeyForAskNeverShowAgain: SessionManager.keyPermissionCameraHidePromptPermanently,
-          //                         ),
-          //                       ],
-          //                     );
-          //                   },
-          //                 );
-          //               }
-          //             }
-          //           },
-          //         );
-          //       },
-          //       child: Container(
-          //         decoration: DesignConfig.boxGradient(10),
-          //         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          //         child: defaultImg(
-          //           image: "barcode_scanner_icon",
-          //           iconColor: ColorsRes.appColorWhite,
-          //           height: 24,
-          //           width: 24,
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // ),
-        ],
+            Container(
+              padding: EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.tune,
+                color: Theme.of(context).primaryColor,
+                size: 16,
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -1010,50 +953,173 @@ Widget getHomeScreenShimmer(BuildContext context) {
         vertical: Constant.size10, horizontal: Constant.size10),
     child: Column(
       children: [
-        CustomShimmer(
+        // Header shimmer with modern design
+        _buildModernShimmerCard(
           height: context.height * 0.26,
           width: context.width,
+          borderRadius: 16,
         ),
-        getSizedBox(
-          height: Constant.size10,
-        ),
-        CustomShimmer(
-          height: Constant.size10,
+        getSizedBox(height: Constant.size15),
+
+        // Search bar shimmer
+        _buildModernShimmerCard(
+          height: 50,
           width: context.width,
+          borderRadius: 25,
         ),
-        getSizedBox(
-          height: Constant.size10,
+        getSizedBox(height: Constant.size15),
+
+        // Categories shimmer
+        Row(
+          children: List.generate(
+            4,
+            (index) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Column(
+                  children: [
+                    _buildModernShimmerCard(
+                      height: 60,
+                      width: 60,
+                      borderRadius: 30,
+                    ),
+                    SizedBox(height: 8),
+                    _buildModernShimmerCard(
+                      height: 12,
+                      width: double.infinity,
+                      borderRadius: 6,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
-        getCategoryShimmer(
-            context: context, count: 6, padding: EdgeInsets.zero),
-        getSizedBox(
-          height: Constant.size10,
-        ),
+        getSizedBox(height: Constant.size20),
+
+        // Product sections
         Column(
-          children: List.generate(5, (index) {
+          children: List.generate(3, (sectionIndex) {
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomShimmer(height: 50),
+                // Section title
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildModernShimmerCard(
+                      height: 20,
+                      width: context.width * 0.4,
+                      borderRadius: 10,
+                    ),
+                    _buildModernShimmerCard(
+                      height: 16,
+                      width: context.width * 0.2,
+                      borderRadius: 8,
+                    ),
+                  ],
+                ),
+                getSizedBox(height: Constant.size15),
+
+                // Product grid
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: List.generate(5, (index) {
+                    children: List.generate(3, (productIndex) {
                       return Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: Constant.size10,
-                            horizontal: Constant.size5),
-                        child: CustomShimmer(
-                          height: 210,
-                          width: context.width * 0.4,
+                        padding: EdgeInsets.only(
+                          right: Constant.size10,
                         ),
+                        child: _buildProductCardShimmer(context),
                       );
                     }),
                   ),
-                )
+                ),
+                getSizedBox(height: Constant.size20),
               ],
             );
           }),
         )
+      ],
+    ),
+  );
+}
+
+Widget _buildModernShimmerCard({
+  required double height,
+  required double width,
+  required double borderRadius,
+}) {
+  return Container(
+    height: height,
+    width: width,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(borderRadius),
+    ),
+    child: Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.white,
+      period: Duration(milliseconds: 1200),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _buildProductCardShimmer(BuildContext context) {
+  return Container(
+    width: context.width * 0.45,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Product image
+        _buildModernShimmerCard(
+          height: context.width * 0.45,
+          width: context.width * 0.45,
+          borderRadius: 12,
+        ),
+        SizedBox(height: 8),
+
+        // Product name
+        _buildModernShimmerCard(
+          height: 16,
+          width: double.infinity,
+          borderRadius: 8,
+        ),
+        SizedBox(height: 4),
+
+        // Product rating
+        Row(
+          children: [
+            _buildModernShimmerCard(
+              height: 12,
+              width: 80,
+              borderRadius: 6,
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+
+        // Price and add to cart
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildModernShimmerCard(
+              height: 18,
+              width: 60,
+              borderRadius: 9,
+            ),
+            _buildModernShimmerCard(
+              height: 32,
+              width: 80,
+              borderRadius: 16,
+            ),
+          ],
+        ),
       ],
     ),
   );
