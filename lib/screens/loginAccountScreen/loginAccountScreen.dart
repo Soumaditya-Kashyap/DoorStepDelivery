@@ -180,18 +180,21 @@ class _LoginAccountState extends State<LoginAccountScreen> {
       ),
     );
   }
-
   Widget loginWidgets() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     return Container(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       constraints: BoxConstraints(
-        maxHeight: context.height * 0.85,
+        maxHeight: screenHeight * 0.88,
+        minHeight: screenHeight * 0.65,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(35),
-          topRight: Radius.circular(35),
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
         ),
         boxShadow: [
           BoxShadow(
@@ -202,17 +205,21 @@ class _LoginAccountState extends State<LoginAccountScreen> {
         ],
       ),
       child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         padding: EdgeInsetsDirectional.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            getSizedBox(height: Constant.size25),
-            // Enhanced Welcome Header with Gradient
+            SizedBox(height: screenHeight * 0.02),
+            // Enhanced Welcome Header - Centered and Responsive
             Container(
-              margin: EdgeInsetsDirectional.only(start: 20, end: 20),
-              padding: EdgeInsets.all(20),
+              margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.05,
+                vertical: screenHeight * 0.025,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -229,58 +236,59 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                 ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Centered Welcome Text
                   RichText(
-                    textAlign: TextAlign.start,
+                    textAlign: TextAlign.center,
                     text: TextSpan(
                       style: Theme.of(context).textTheme.titleSmall!.merge(
                             TextStyle(
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
-                              fontSize: 28,
+                              fontSize: screenWidth * 0.065,
                               color: ColorsRes.mainTextColor,
+                              height: 1.2,
                             ),
                           ),
-                      text: "${getTranslatedValue(
-                        context,
-                        "welcome",
-                      )} ",
+                      text: "${getTranslatedValue(context, "welcome")} ",
                       children: <TextSpan>[
                         TextSpan(
                           text: "\nDrunkPanda!",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
-                            fontSize: 32,
+                            fontSize: screenWidth * 0.075,
                             color: ColorsRes.appColor,
+                            height: 1.1,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  getSizedBox(height: 12),
+                  SizedBox(height: screenHeight * 0.015),
+                  // Centered Description
                   Text(
                     "${getTranslatedValue(context, "login_message1")}",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: ColorsRes.subTitleMainTextColor,
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04,
                       fontWeight: FontWeight.w400,
+                      height: 1.3,
                     ),
                   ),
                 ],
               ),
             ),
             if (Constant.authTypePhoneLogin == "1" ||
-                Constant.authTypeEmailLogin == "1") ...[
-              getSizedBox(height: Constant.size30),
+                Constant.authTypeEmailLogin == "1") ...[              SizedBox(height: screenHeight * 0.03),
               AnimatedOpacity(
                 opacity: showMobileNumberWidget ? 1.0 : 0.0,
                 duration: Duration(milliseconds: 400),
                 child: Visibility(
                   visible: showMobileNumberWidget,
                   child: Container(
-                    margin: EdgeInsetsDirectional.only(start: 20, end: 20),
+                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                     child: mobilePasswordWidget(),
                   ),
                 ),
@@ -291,15 +299,15 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                 child: Visibility(
                   visible: !showMobileNumberWidget,
                   child: Container(
-                    margin: EdgeInsetsDirectional.only(start: 20, end: 20),
+                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                     child: emailPasswordWidget(),
                   ),
                 ),
               ),
-              getSizedBox(height: Constant.size25),
+              SizedBox(height: screenHeight * 0.025),
               // Enhanced Login Button
               Padding(
-                padding: EdgeInsetsDirectional.only(start: 20, end: 20),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
@@ -313,12 +321,14 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                   ),
                   child: proceedBtn(),
                 ),
-              ),
-              getSizedBox(height: Constant.size25),
+              ),              SizedBox(height: screenHeight * 0.02),
               // Enhanced Register Link
               Container(
-                margin: EdgeInsetsDirectional.only(start: 20, end: 20),
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.015,
+                  horizontal: screenWidth * 0.04,
+                ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(12),
@@ -345,34 +355,35 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CustomTextLabel(
-                        jsonKey: "dont_have_an_account",
-                        style: TextStyle(
-                          color: ColorsRes.subTitleMainTextColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
+                      Flexible(
+                        child: CustomTextLabel(
+                          jsonKey: "dont_have_an_account",
+                          style: TextStyle(
+                            color: ColorsRes.subTitleMainTextColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: screenWidth * 0.035,
+                          ),
                         ),
                       ),
-                      getSizedBox(width: 8),
+                      SizedBox(width: 8),
                       CustomTextLabel(
                         jsonKey: "wants_to_register",
                         style: TextStyle(
                           color: ColorsRes.appColor,
                           fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                        ),
+                          fontSize: screenWidth * 0.035,                        ),
                       ),
-                      getSizedBox(width: 5),
+                      SizedBox(width: 5),
                       Icon(
                         Icons.arrow_forward_rounded,
                         color: ColorsRes.appColor,
-                        size: 18,
+                        size: screenWidth * 0.04,
                       ),
                     ],
                   ),
                 ),
               ),
-              getSizedBox(height: Constant.size25),
+              SizedBox(height: screenHeight * 0.02),
               if (Platform.isIOS && Constant.authTypeAppleLogin == "1" ||
                   Constant.authTypeGoogleLogin == "1")
                 buildDottedDivider(context),
@@ -447,12 +458,11 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                     );
                   },
                 ),
-              ),
-            if (Constant.authTypeEmailLogin == "1" &&
+              ),            if (Constant.authTypeEmailLogin == "1" &&
                 Constant.authTypePhoneLogin == "1") ...[
               if (showMobileNumberWidget)
                 Padding(
-                  padding: EdgeInsetsDirectional.only(start: 20, end: 20),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                   child: SocialMediaLoginButtonWidget(
                     text: "continue_with_email",
                     logo: "email_logo",
@@ -466,7 +476,7 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                 ),
               if (!showMobileNumberWidget)
                 Padding(
-                  padding: EdgeInsetsDirectional.only(start: 20, end: 20),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                   child: SocialMediaLoginButtonWidget(
                     text: "continue_with_phone",
                     logo: "phone_logo",
@@ -479,19 +489,23 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                   ),
                 ),
             ],
-            getSizedBox(height: Constant.size20),
-            Divider(color: ColorsRes.subTitleMainTextColor),
-            getSizedBox(height: Constant.size20),
+            SizedBox(height: screenHeight * 0.02),
             Padding(
-              padding: EdgeInsetsDirectional.only(start: 30, end: 30),
-              child: Center(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              child: Divider(color: ColorsRes.subTitleMainTextColor),
+            ),
+            SizedBox(height: screenHeight * 0.015),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),              child: Center(
                 child: RichText(
-                  textAlign: TextAlign.start,
+                  textAlign: TextAlign.center,
                   text: TextSpan(
                     style: Theme.of(context).textTheme.titleSmall!.merge(
                           TextStyle(
                             fontWeight: FontWeight.w400,
                             color: ColorsRes.subTitleMainTextColor,
+                            fontSize: screenWidth * 0.032,
+                            height: 1.4,
                           ),
                         ),
                     text: "${getTranslatedValue(
@@ -540,11 +554,10 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                           },
                       ),
                     ],
-                  ),
-                ),
+                  ),                ),
               ),
             ),
-            getSizedBox(height: Constant.size20),
+            SizedBox(height: screenHeight * 0.02),
           ],
         ),
       ),

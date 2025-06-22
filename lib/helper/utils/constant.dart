@@ -7,9 +7,11 @@ enum ThemeList { systemDefault, light, dark }
 class Constant {
   // ADMIN PANEL URL
   static String hostUrl = "https://egrocer.wrteam.me/";
+  // static String hostUrl = "https://purnima.xamtechinnovation.com/";
 
   // WEBSITE URL
   static String websiteUrl = "https://grocery.xamtechinnovation.com/";
+  // static String websiteUrl = "https://purnima.xamtechinnovation.com/";
 
   static String baseUrl = "${hostUrl}customer/";
 
