@@ -180,10 +180,11 @@ class _LoginAccountState extends State<LoginAccountScreen> {
       ),
     );
   }
+
   Widget loginWidgets() {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Container(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       constraints: BoxConstraints(
@@ -208,7 +209,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
         physics: BouncingScrollPhysics(),
         padding: EdgeInsetsDirectional.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),        child: Column(
+        ),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -281,14 +283,16 @@ class _LoginAccountState extends State<LoginAccountScreen> {
               ),
             ),
             if (Constant.authTypePhoneLogin == "1" ||
-                Constant.authTypeEmailLogin == "1") ...[              SizedBox(height: screenHeight * 0.03),
+                Constant.authTypeEmailLogin == "1") ...[
+              SizedBox(height: screenHeight * 0.03),
               AnimatedOpacity(
                 opacity: showMobileNumberWidget ? 1.0 : 0.0,
                 duration: Duration(milliseconds: 400),
                 child: Visibility(
                   visible: showMobileNumberWidget,
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    margin:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                     child: mobilePasswordWidget(),
                   ),
                 ),
@@ -299,7 +303,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                 child: Visibility(
                   visible: !showMobileNumberWidget,
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    margin:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                     child: emailPasswordWidget(),
                   ),
                 ),
@@ -321,7 +326,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                   ),
                   child: proceedBtn(),
                 ),
-              ),              SizedBox(height: screenHeight * 0.02),
+              ),
+              SizedBox(height: screenHeight * 0.02),
               // Enhanced Register Link
               Container(
                 margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
@@ -371,7 +377,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                         style: TextStyle(
                           color: ColorsRes.appColor,
                           fontWeight: FontWeight.w700,
-                          fontSize: screenWidth * 0.035,                        ),
+                          fontSize: screenWidth * 0.035,
+                        ),
                       ),
                       SizedBox(width: 5),
                       Icon(
@@ -458,7 +465,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                     );
                   },
                 ),
-              ),            if (Constant.authTypeEmailLogin == "1" &&
+              ),
+            if (Constant.authTypeEmailLogin == "1" &&
                 Constant.authTypePhoneLogin == "1") ...[
               if (showMobileNumberWidget)
                 Padding(
@@ -496,7 +504,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
             ),
             SizedBox(height: screenHeight * 0.015),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),              child: Center(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+              child: Center(
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -554,7 +563,8 @@ class _LoginAccountState extends State<LoginAccountScreen> {
                           },
                       ),
                     ],
-                  ),                ),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: screenHeight * 0.02),

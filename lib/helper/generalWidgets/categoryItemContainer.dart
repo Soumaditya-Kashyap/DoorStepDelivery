@@ -7,41 +7,66 @@ class CategoryItemContainer extends StatelessWidget {
   const CategoryItemContainer(
       {Key? key, required this.category, required this.voidCallBack})
       : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: voidCallBack,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(
-            flex: 7,
-            child: Padding(
-              padding: EdgeInsetsDirectional.all(10),
-              child: SizedBox(
-                height: context.width,
-                width: context.height,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Image section
+            Expanded(
+              flex: 8,
+              child: Container(
+                margin: const EdgeInsets.all(8),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: setNetworkImg(
-                    image: category.imageUrl ?? "",
+                  child: Container(
+                    width: double.infinity,
+                    child: setNetworkImg(
+                      image: category.imageUrl ?? "",
+                      boxFit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
+            ), // Text section
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      category.name ?? "",
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: ColorsRes.mainTextColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: CustomTextLabel(
-              text: category.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

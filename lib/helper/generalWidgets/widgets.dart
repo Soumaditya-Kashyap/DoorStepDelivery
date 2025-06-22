@@ -62,18 +62,22 @@ List getHomeBottomNavigationBarIcons({required bool isActive}) {
     getDarkLightIcon(
         image: "home",
         isActive: isActive,
+        iconColor: isActive ? ColorsRes.appColor : null,
         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0)),
     getDarkLightIcon(
         image: "category",
         isActive: isActive,
+        iconColor: isActive ? ColorsRes.appColor : null,
         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0)),
     getDarkLightIcon(
         image: "wishlist",
         isActive: isActive,
+        iconColor: isActive ? ColorsRes.appColor : null,
         padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0)),
     getDarkLightIcon(
         image: "profile",
         isActive: isActive,
+        iconColor: isActive ? ColorsRes.appColor : null,
         padding: EdgeInsetsDirectional.zero),
   ];
 }
@@ -211,23 +215,68 @@ Widget getCategoryShimmer(
     {required BuildContext context, int? count, EdgeInsets? padding}) {
   return GridView.builder(
     itemCount: count,
-    padding: padding ??
-        EdgeInsets.symmetric(
-            horizontal: Constant.size10, vertical: Constant.size10),
+    padding: padding ?? const EdgeInsets.symmetric(vertical: 16),
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     itemBuilder: (BuildContext context, int index) {
-      return CustomShimmer(
-        width: context.width,
-        height: context.height,
-        borderRadius: 8,
+      return Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Image shimmer
+            Expanded(
+              flex: 8,
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                child: CustomShimmer(
+                  width: double.infinity,
+                  height: double.infinity,
+                  borderRadius: 8,
+                ),
+              ),
+            ), // Text shimmer
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomShimmer(
+                      width: double.infinity,
+                      height: 11,
+                      borderRadius: 4,
+                    ),
+                    const SizedBox(height: 2),
+                    CustomShimmer(
+                      width: 50,
+                      height: 9,
+                      borderRadius: 4,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     },
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        childAspectRatio: 0.8,
-        crossAxisCount: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10),
+      childAspectRatio: 0.8,
+      crossAxisCount: 3,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+    ),
   );
 }
 
@@ -430,50 +479,40 @@ Widget getSearchWidget({
       Navigator.pushNamed(context, productSearchScreen);
     },
     child: Container(
-      margin: EdgeInsets.all(0),
-      padding: EdgeInsets.all(0),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: ColorsRes.subTitleMainTextColor.withOpacity(0.2),
-            width: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ColorsRes.subTitleMainTextColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.search_rounded,
+            color: ColorsRes.subTitleMainTextColor,
+            size: 20,
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.search_rounded,
-              color: ColorsRes.subTitleMainTextColor,
-              size: 20,
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                getTranslatedValue(context, "product_search_hint"),
-                style: TextStyle(
-                  color: ColorsRes.subTitleMainTextColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              getTranslatedValue(context, "product_search_hint"),
+              style: TextStyle(
+                color: ColorsRes.subTitleMainTextColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.tune,
-                color: Theme.of(context).primaryColor,
-                size: 16,
-              ),
-            ),
-          ],
-        ),
+          ),
+          Icon(
+            Icons.tune,
+            color: ColorsRes.subTitleMainTextColor,
+            size: 18,
+          ),
+        ],
       ),
     ),
   );

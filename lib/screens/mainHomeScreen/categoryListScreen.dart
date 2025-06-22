@@ -23,7 +23,8 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
   scrollListener() {
     // var nextPageTrigger = 0.99 * scrollController.position.maxScrollExtent;
 
-    if(scrollController.position.maxScrollExtent == scrollController.offset){// if (scrollController.position.pixels > nextPageTrigger) {
+    if (scrollController.position.maxScrollExtent == scrollController.offset) {
+      // if (scrollController.position.pixels > nextPageTrigger) {
       if (mounted) {
         if (context.read<CategoryListProvider>().hasMoreData) {
           callApi(false);
@@ -87,10 +88,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
             getSearchWidget(context: context),
             Expanded(
               child: Container(
-                margin: EdgeInsetsDirectional.all(10),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(10)),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: ListView(
                   controller: scrollController,
                   children: [
@@ -113,11 +111,9 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
             categoryListProvider.categoryState == CategoryState.loadingMore) {
           return GridView.builder(
             itemCount: categoryListProvider.categories.length,
-            padding: EdgeInsets.symmetric(
-                horizontal: Constant.size10, vertical: Constant.size10),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            // Disable GridView scrolling
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
               CategoryItem category = categoryListProvider.categories[index];
 
@@ -142,10 +138,11 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
               );
             },
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                childAspectRatio: 0.8,
-                crossAxisCount: 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10),
+              childAspectRatio: 0.8,
+              crossAxisCount: 3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
           );
         } else if (categoryListProvider.categoryState ==
             CategoryState.loading) {
