@@ -28,21 +28,29 @@ class DefaultBlankItemMessageScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 200,
-            height: 200,
-            margin: const EdgeInsets.only(bottom: 50),
+            width: 180,
+            height: 180,
+            margin: const EdgeInsets.only(bottom: 30),
             decoration: ShapeDecoration(
-              color: ColorsRes.defaultPageInnerCircle,
+              gradient: LinearGradient(
+                colors: [
+                  ColorsRes.appColor.withOpacity(0.1),
+                  ColorsRes.appColor.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: CircleBorder(
                 side: BorderSide(
-                    width: 20, color: ColorsRes.defaultPageOuterCircle),
+                    width: 3, color: ColorsRes.appColor.withOpacity(0.2)),
               ),
             ),
             child: Center(
               child: defaultImg(
                 image: image,
-                width: context.width * 0.25,
-                height: context.width * 0.25,
+                width: context.width * 0.2,
+                height: context.width * 0.2,
+                iconColor: ColorsRes.appColor,
               ),
             ),
           ),
@@ -52,23 +60,27 @@ class DefaultBlankItemMessageScreen extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineSmall!.merge(
                   TextStyle(
-                    color: ColorsRes.appColor,
-                    fontWeight: FontWeight.w500,
+                    color: ColorsRes.mainTextColor,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
                 ),
           ),
-          SizedBox(height: Constant.size10),
-          CustomTextLabel(
-            jsonKey: description,
-            softWrap: true,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium!.merge(
-                  TextStyle(
-                    letterSpacing: 0.5,
-                    color: ColorsRes.mainTextColor,
+          SizedBox(height: Constant.size15),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: CustomTextLabel(
+              jsonKey: description,
+              softWrap: true,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium!.merge(
+                    TextStyle(
+                      letterSpacing: 0.3,
+                      color: ColorsRes.subTitleMainTextColor,
+                      height: 1.4,
+                    ),
                   ),
-                ),
+            ),
           ),
           if (callback != null && buttonTitle != null)
             const SizedBox(height: 20),

@@ -16,7 +16,6 @@ class NotificationProvider extends ChangeNotifier {
   bool hasMoreData = false;
   int totalData = 0;
   int offset = 0;
-
   getNotificationProvider({
     required Map<String, dynamic> params,
     required BuildContext context,
