@@ -27,29 +27,46 @@ class _ProductListFilterScreenState extends State<ProductListFilterScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((value) async {
-      await setTempValues().then((value) =>
-          context.read<ProductFilterProvider>().currentRangeValues =
-              RangeValues(widget.totalMinPrice, widget.totalMaxPrice));
-      context.read<ProductFilterProvider>().setCurrentIndex(0);
-      context
-          .read<ProductFilterProvider>()
-          .setMinMaxPriceRange(widget.totalMinPrice, widget.totalMaxPrice);
-      context
-          .read<ProductFilterProvider>()
-          .setCategories(widget.selectedCategoryId);
+      if (mounted) {
+        try {
+          await setTempValues().then((value) {
+            if (mounted) {
+              context.read<ProductFilterProvider>().currentRangeValues =
+                  RangeValues(widget.totalMinPrice, widget.totalMaxPrice);
+            }
+          });
+          if (mounted) {
+            context.read<ProductFilterProvider>().setCurrentIndex(0);
+            context.read<ProductFilterProvider>().setMinMaxPriceRange(
+                widget.totalMinPrice, widget.totalMaxPrice);
+            context
+                .read<ProductFilterProvider>()
+                .setCategories(widget.selectedCategoryId);
+          }
+        } catch (e) {
+          print('Error in initState: $e');
+        }
+      }
     });
   }
 
   Future<bool> setTempValues() async {
-    context.read<ProductFilterProvider>().currentRangeValues =
-        Constant.currentRangeValues;
-    context.read<ProductFilterProvider>().selectedBrands =
-        Constant.selectedBrands;
-    context.read<ProductFilterProvider>().selectedSizes =
-        Constant.selectedSizes;
-    context.read<ProductFilterProvider>().selectedCategories =
-        Constant.selectedCategories;
-    return true;
+    if (!mounted) return false;
+
+    try {
+      context.read<ProductFilterProvider>().currentRangeValues =
+          Constant.currentRangeValues;
+      context.read<ProductFilterProvider>().selectedBrands =
+          Constant.selectedBrands;
+      context.read<ProductFilterProvider>().selectedSizes =
+          Constant.selectedSizes;
+      context.read<ProductFilterProvider>().selectedCategories =
+          Constant.selectedCategories;
+      return true;
+    } catch (e) {
+      print('Error in setTempValues: $e');
+      return false;
+    }
   }
 
   @override
@@ -93,67 +110,145 @@ class _ProductListFilterScreenState extends State<ProductListFilterScreen> {
               bottom: 10,
               start: 10,
               end: (context.width * 0.6) - 10,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView(
-                      children: List.generate(
-                        lblFilterTypesList.length,
-                        (index) {
-                          return (index == 2 &&
-                                  widget.totalMinPrice == widget.totalMaxPrice)
-                              ? const SizedBox.shrink()
-                              : ListTile(
-                                  onTap: () {
-                                    context
-                                        .read<ProductFilterProvider>()
-                                        .setCurrentIndex(index);
-                                  },
-                                  selected: context
-                                          .watch<ProductFilterProvider>()
-                                          .currentSelectedFilterIndex ==
-                                      index,
-                                  selectedTileColor:
-                                      Theme.of(context).cardColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadiusDirectional.only(
-                                      topStart: Radius.circular(10),
-                                      bottomStart: Radius.circular(
-                                        10,
-                                      ),
-                                    ),
-                                  ),
-                                  title: CustomTextLabel(
-                                    jsonKey: lblFilterTypesList[index],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: ColorsRes.mainTextColor,
-                                    ),
-                                  ),
-                                  splashColor: ColorsRes.appColorLight,
-                                );
-                        },
-                      ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 5,
+                      offset: Offset(0, 2),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      context.read<ProductFilterProvider>().resetAllFilters();
-                      setState(() {});
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsetsDirectional.only(end: 10, bottom: 32),
+                  ],
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       child: CustomTextLabel(
-                        jsonKey: "clean_all",
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: ColorsRes.mainTextColor,
-                              fontSize: 15,
-                            ),
+                        jsonKey: "filter_by",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: ColorsRes.mainTextColor,
+                        ),
                       ),
                     ),
-                  )
-                ],
+                    Divider(height: 1),
+                    SizedBox(height: 5),
+                    Expanded(
+                      child: ListView(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        children: List.generate(
+                          lblFilterTypesList.length,
+                          (index) {
+                            return (index == 2 &&
+                                    widget.totalMinPrice ==
+                                        widget.totalMaxPrice)
+                                ? const SizedBox.shrink()
+                                : Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: context
+                                                  .watch<
+                                                      ProductFilterProvider>()
+                                                  .currentSelectedFilterIndex ==
+                                              index
+                                          ? ColorsRes
+                                              .appColorLightHalfTransparent
+                                          : Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: ListTile(
+                                      onTap: () {
+                                        context
+                                            .read<ProductFilterProvider>()
+                                            .setCurrentIndex(index);
+                                      },
+                                      selected: context
+                                              .watch<ProductFilterProvider>()
+                                              .currentSelectedFilterIndex ==
+                                          index,
+                                      selectedTileColor:
+                                          Theme.of(context).cardColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      title: CustomTextLabel(
+                                        jsonKey: lblFilterTypesList[index],
+                                        style: TextStyle(
+                                          fontWeight: context
+                                                      .watch<
+                                                          ProductFilterProvider>()
+                                                      .currentSelectedFilterIndex ==
+                                                  index
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          color: context
+                                                      .watch<
+                                                          ProductFilterProvider>()
+                                                      .currentSelectedFilterIndex ==
+                                                  index
+                                              ? ColorsRes.appColorDark
+                                              : ColorsRes.mainTextColor,
+                                        ),
+                                      ),
+                                      trailing: context
+                                                  .watch<
+                                                      ProductFilterProvider>()
+                                                  .currentSelectedFilterIndex ==
+                                              index
+                                          ? Icon(
+                                              Icons.circle,
+                                              size: 12,
+                                              color: ColorsRes.appColor,
+                                            )
+                                          : null,
+                                      dense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 15, vertical: 5),
+                                    ),
+                                  );
+                          },
+                        ),
+                      ),
+                    ),
+                    Divider(height: 1),
+                    GestureDetector(
+                      onTap: () {
+                        context.read<ProductFilterProvider>().resetAllFilters();
+                        setState(() {});
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.refresh,
+                              size: 16,
+                              color: ColorsRes.appColor,
+                            ),
+                            SizedBox(width: 5),
+                            CustomTextLabel(
+                              jsonKey: "clean_all",
+                              style: TextStyle(
+                                color: ColorsRes.appColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             //Filter list's values screen
@@ -163,62 +258,98 @@ class _ProductListFilterScreenState extends State<ProductListFilterScreen> {
               start: context.width * 0.4,
               end: 0,
               child: Container(
-                decoration:
-                    DesignConfig.boxDecoration(Theme.of(context).cardColor, 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 5,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
                 margin: EdgeInsetsDirectional.only(
                     start: 5, top: 10, bottom: 10, end: 10),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: context
-                                  .watch<ProductFilterProvider>()
-                                  .currentSelectedFilterIndex ==
-                              0
-                          ? ChangeNotifierProvider<CategoryListProvider>(
-                              create: (context) => CategoryListProvider(),
-                              child: FilterCategoryList(
-                                categoryName: null,
-                                categoryId: null,
-                              ),
-                            )
-                          : context
-                                      .watch<ProductFilterProvider>()
-                                      .currentSelectedFilterIndex ==
-                                  1
-                              ? getBrandWidget(widget.brands, context)
-                              : context
-                                          .watch<ProductFilterProvider>()
-                                          .currentSelectedFilterIndex ==
-                                      2
-                                  ? getSizeWidget(widget.sizes, context)
-                                  : widget.totalMinPrice != widget.totalMaxPrice
-                                      ? getPriceRangeWidget(
-                                          widget.totalMinPrice,
-                                          widget.totalMaxPrice,
-                                          context)
-                                      : const SizedBox.shrink(),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context, true);
-                      },
                       child: Container(
-                        width: double.maxFinite,
-                        height: 45,
-                        margin: const EdgeInsets.all(20),
-                        // padding: const EdgeInsets.all(20),
-                        decoration: DesignConfig.boxGradient(10),
-                        child: Center(
-                          child: CustomTextLabel(
-                            jsonKey: "apply",
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
-                                ?.copyWith(
-                                  color: ColorsRes.appColorWhite,
-                                  fontSize: 15,
+                        padding: EdgeInsets.all(10),
+                        child: context
+                                    .watch<ProductFilterProvider>()
+                                    .currentSelectedFilterIndex ==
+                                0
+                            ? ChangeNotifierProvider<CategoryListProvider>(
+                                create: (context) => CategoryListProvider(),
+                                child: FilterCategoryList(
+                                  categoryName: null,
+                                  categoryId: null,
                                 ),
+                              )
+                            : context
+                                        .watch<ProductFilterProvider>()
+                                        .currentSelectedFilterIndex ==
+                                    1
+                                ? getBrandWidget(widget.brands, context)
+                                : context
+                                            .watch<ProductFilterProvider>()
+                                            .currentSelectedFilterIndex ==
+                                        2
+                                    ? getSizeWidget(widget.sizes, context)
+                                    : widget.totalMinPrice !=
+                                            widget.totalMaxPrice
+                                        ? getPriceRangeWidget(
+                                            widget.totalMinPrice,
+                                            widget.totalMaxPrice,
+                                            context)
+                                        : const SizedBox.shrink(),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(12),
+                          bottomRight: Radius.circular(12),
+                        ),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: Container(
+                          width: double.maxFinite,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                ColorsRes.gradient1,
+                                ColorsRes.gradient2
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: ColorsRes.appColor.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: CustomTextLabel(
+                              jsonKey: "apply",
+                              style: TextStyle(
+                                color: ColorsRes.appColorWhite,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ),
                       ),

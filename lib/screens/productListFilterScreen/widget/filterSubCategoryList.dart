@@ -41,8 +41,13 @@ class _FilterSubCategoryListState extends State<FilterSubCategoryList> {
 // _scrollController fetches the next paginated data when the current position of the user on the screen has surpassed
     if (scrollController.position.pixels > nextPageTrigger) {
       if (mounted) {
-        if (context.read<CategoryListProvider>().hasMoreData) {
-          callApi(false);
+        try {
+          if (context.read<CategoryListProvider>().hasMoreData) {
+            callApi(false);
+          }
+        } catch (e) {
+          // Handle case where context is no longer available
+          print('Context error in scroll listener: $e');
         }
       }
     }
@@ -59,20 +64,29 @@ class _FilterSubCategoryListState extends State<FilterSubCategoryList> {
   }
 
   callApi(bool isReset) {
-    if (isReset == true) {
-      context.read<CategoryListProvider>().offset = 0;
-      context.read<CategoryListProvider>().categories.clear();
+    if (!mounted) return Future.value();
+
+    try {
+      if (isReset == true) {
+        context.read<CategoryListProvider>().offset = 0;
+        context.read<CategoryListProvider>().categories.clear();
+      }
+      return context
+          .read<CategoryListProvider>()
+          .getCategoryApiProvider(context: context, params: {
+        ApiAndParams.categoryId:
+            widget.categoryId == null ? "0" : widget.categoryId.toString()
+      });
+    } catch (e) {
+      print('Error in callApi: $e');
+      return Future.value();
     }
-    return context
-        .read<CategoryListProvider>()
-        .getCategoryApiProvider(context: context, params: {
-      ApiAndParams.categoryId:
-          widget.categoryId == null ? "0" : widget.categoryId.toString()
-    });
   }
 
   @override
   dispose() {
+    scrollController.removeListener(scrollListener);
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -89,34 +103,46 @@ class _FilterSubCategoryListState extends State<FilterSubCategoryList> {
       child: Column(
         children: [
           if (widget.categoryName != null)
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    categoryNavigatorKey.currentState?.pop();
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    child: Padding(
-                      padding: EdgeInsets.all(18),
+            Container(
+              color: Theme.of(context).cardColor,
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              margin: EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      categoryNavigatorKey.currentState?.pop();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.all(12),
                       child: SizedBox(
-                        child: defaultImg(
-                          boxFit: BoxFit.contain,
-                          image: "ic_arrow_back",
-                          iconColor: ColorsRes.mainTextColor,
+                        child: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 16,
+                          color: ColorsRes.mainTextColor,
                         ),
-                        height: 10,
-                        width: 10,
+                        height: 16,
+                        width: 16,
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: CustomTextLabel(
-                    text: widget.categoryName,
-                  ),
-                )
-              ],
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: CustomTextLabel(
+                      text: widget.categoryName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: ColorsRes.mainTextColor,
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           Expanded(
             child: Consumer<ProductFilterProvider>(
@@ -152,23 +178,43 @@ class _FilterSubCategoryListState extends State<FilterSubCategoryList> {
                               },
                               child: Container(
                                 padding: EdgeInsetsDirectional.only(
-                                    start: 10, end: 10, top: 5, bottom: 5),
+                                    start: 15, end: 15, top: 12, bottom: 12),
+                                margin: EdgeInsetsDirectional.only(
+                                    start: 5, end: 5, top: 4, bottom: 4),
                                 decoration: BoxDecoration(
                                   color: productFilterProvider
                                           .selectedCategories
                                           .contains(category.id.toString())
                                       ? ColorsRes.appColorLightHalfTransparent
                                       : Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 5,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: Row(
                                   children: [
-                                    getSizedBox(width: 10),
                                     Expanded(
                                       child: CustomTextLabel(
                                         text: category.name,
                                         style: TextStyle(
-                                            color: ColorsRes.mainTextColor,
-                                            fontSize: 16),
+                                            color: productFilterProvider
+                                                    .selectedCategories
+                                                    .contains(
+                                                        category.id.toString())
+                                                ? ColorsRes.appColorDark
+                                                : ColorsRes.mainTextColor,
+                                            fontSize: 15,
+                                            fontWeight: productFilterProvider
+                                                    .selectedCategories
+                                                    .contains(
+                                                        category.id.toString())
+                                                ? FontWeight.w600
+                                                : FontWeight.normal),
                                       ),
                                     ),
                                     if (category.hasChild == false &&
@@ -176,23 +222,36 @@ class _FilterSubCategoryListState extends State<FilterSubCategoryList> {
                                             .contains(
                                           category.id.toString(),
                                         ))
-                                      Icon(
-                                        Icons.check_rounded,
-                                        size: 19,
-                                        color: ColorsRes.appColor,
+                                      Container(
+                                        padding: EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          color: ColorsRes.appColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.check_rounded,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     if (category.hasChild == true)
-                                      Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        size: 17,
-                                        color: ColorsRes.mainTextColor,
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        padding: EdgeInsets.all(4),
+                                        child: Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          size: 14,
+                                          color: ColorsRes.mainTextColor,
+                                        ),
                                       ),
-                                    getSizedBox(width: 10),
                                   ],
                                 ),
                               ),
                             ),
-                            getDivider(height: 0),
                           ],
                         );
                       },

@@ -15,22 +15,32 @@ getBrandWidget(List<Brands> brands, BuildContext context) {
               .addRemoveBrandIds(brand.id.toString());
         },
         child: Card(
-          elevation: 0,
-          shape: DesignConfig.setRoundedBorder(10),
+          elevation: 3,
+          shadowColor: Colors.black.withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           color: Theme.of(context).scaffoldBackgroundColor,
           surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
-          margin: EdgeInsets.zero,
+          margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
                 child: Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: Constant.borderRadius10,
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: setNetworkImg(
-                          image: brand.imageUrl, boxFit: BoxFit.cover),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(12)),
+                        color: Colors.white,
+                      ),
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(12)),
+                        child: setNetworkImg(
+                            image: brand.imageUrl, boxFit: BoxFit.cover),
+                      ),
                     ),
                     if (context
                         .watch<ProductFilterProvider>()
@@ -43,25 +53,47 @@ getBrandWidget(List<Brands> brands, BuildContext context) {
                         end: 0,
                         child: Container(
                             decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha:0.8),
-                                borderRadius: Constant.borderRadius10),
+                                color: Colors.black.withOpacity(0.7),
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(12))),
                             child: Icon(
                               Icons.check_rounded,
                               color: ColorsRes.appColor,
-                              size: 60,
+                              size: 40,
                             )),
                       ),
                   ],
                 ),
               ),
-              getSizedBox(
-                height: Constant.size10,
-              ),
-              CustomTextLabel(
-                text: brand.name,
-                softWrap: true,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius:
+                      BorderRadius.vertical(bottom: Radius.circular(12)),
+                ),
+                child: CustomTextLabel(
+                  text: brand.name,
+                  softWrap: true,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontWeight: context
+                            .watch<ProductFilterProvider>()
+                            .selectedBrands
+                            .contains(brand.id.toString())
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: context
+                            .watch<ProductFilterProvider>()
+                            .selectedBrands
+                            .contains(brand.id.toString())
+                        ? ColorsRes.appColor
+                        : ColorsRes.mainTextColor,
+                  ),
+                ),
               ),
             ],
           ),
@@ -69,9 +101,9 @@ getBrandWidget(List<Brands> brands, BuildContext context) {
       );
     },
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        childAspectRatio: 0.74,
+        childAspectRatio: 0.8,
         crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10),
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5),
   );
 }
