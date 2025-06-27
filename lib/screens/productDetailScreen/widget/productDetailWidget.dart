@@ -30,212 +30,325 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            return Row(
-              children: [
-                OtherImagesViewWidget(context, Axis.vertical, constraints),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      fullScreenProductImageScreen,
-                      arguments: [
-                        context.read<ProductDetailProvider>().currentImage,
-                        context.read<ProductDetailProvider>().images,
-                      ],
-                    );
-                  },
-                  child: Consumer<SelectedVariantItemProvider>(
-                    builder: (context, selectedVariantItemProvider, child) {
-                      return Padding(
-                        padding: EdgeInsetsDirectional.only(
-                            start: 10, top: 10, end: 10),
-                        child: ClipRRect(
-                          borderRadius: Constant.borderRadius10,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          child: setNetworkImg(
-                            boxFit: BoxFit.cover,
-                            image: context.read<ProductDetailProvider>().images[
-                                context
-                                    .read<ProductDetailProvider>()
-                                    .currentImage],
-                            height: (context
-                                        .read<ProductDetailProvider>()
-                                        .productData
-                                        .images
-                                        .length >
-                                    1)
-                                ? ((constraints.maxWidth * 0.8) - 10)
-                                : constraints.maxWidth - 20,
-                            width: (context
-                                        .read<ProductDetailProvider>()
-                                        .productData
-                                        .images
-                                        .length >
-                                    1)
-                                ? ((constraints.maxWidth * 0.8) - 10)
-                                : constraints.maxWidth - 20,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+        // Enhanced Image Section with improved layout
         Container(
-          padding: EdgeInsetsDirectional.only(
-              top: 10, start: 10, end: 10, bottom: 10),
-          margin: EdgeInsetsDirectional.only(
-            top: 10,
-            start: 10,
-            end: 10,
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-          decoration:
-              DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
-          child: Consumer<SelectedVariantItemProvider>(
-            builder: (context, selectedVariantItemProvider, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Row(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomTextLabel(
-                          text: widget.product.name,
-                          softWrap: true,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: ColorsRes.mainTextColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  getSizedBox(height: Constant.size10),
-                  Padding(
-                    padding: EdgeInsetsDirectional.only(end: 5),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CustomTextLabel(
-                          text: double.parse(widget
-                                      .product
-                                      .variants[selectedVariantItemProvider
-                                          .getSelectedIndex()]
-                                      .discountedPrice) !=
-                                  0
-                              ? widget
-                                  .product
-                                  .variants[selectedVariantItemProvider
-                                      .getSelectedIndex()]
-                                  .discountedPrice
-                                  .currency
-                              : widget
-                                  .product
-                                  .variants[selectedVariantItemProvider
-                                      .getSelectedIndex()]
-                                  .price
-                                  .currency,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: 17,
-                              color: ColorsRes.appColor,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        getSizedBox(width: 5),
-                        RichText(
-                          maxLines: 2,
-                          softWrap: true,
-                          overflow: TextOverflow.clip,
-                          text: TextSpan(children: [
-                            TextSpan(
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  color: ColorsRes.grey,
-                                  decoration: TextDecoration.lineThrough,
-                                  decorationThickness: 2),
-                              text: double.parse(widget.product.variants[0]
-                                          .discountedPrice) !=
-                                      0
-                                  ? widget.product.variants[0].price.currency
-                                  : "",
-                            ),
-                          ]),
-                        ),
-                        Spacer(),
-                        ProductListRatingBuilderWidget(
-                          averageRating: context
-                              .read<RatingListProvider>()
-                              .productRatingData
-                              .averageRating
-                              .toString()
-                              .toDouble,
-                          totalRatings: context
-                              .read<RatingListProvider>()
-                              .totalData
-                              .toString()
-                              .toInt,
-                          size: 15,
-                          spacing: 2,
-                          fontSize: 16,
-                        )
-                      ],
+                  // Thumbnail images (if multiple images)
+                  if (context
+                          .read<ProductDetailProvider>()
+                          .productData
+                          .images
+                          .length >
+                      1)
+                    Container(
+                      width: 70,
+                      child: OtherImagesViewWidget(
+                          context, Axis.vertical, constraints),
                     ),
-                  ),
-                  getSizedBox(height: Constant.size10),
-                  ProductDetailAddToCartButtonWidget(
-                    context: context,
-                    product: widget.product,
+
+                  // Main product image
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          fullScreenProductImageScreen,
+                          arguments: [
+                            context.read<ProductDetailProvider>().currentImage,
+                            context.read<ProductDetailProvider>().images,
+                          ],
+                        );
+                      },
+                      child: Consumer<SelectedVariantItemProvider>(
+                        builder: (context, selectedVariantItemProvider, child) {
+                          return Container(
+                            margin: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey.withValues(alpha: 0.02),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: AspectRatio(
+                                aspectRatio: 1.0, // Square aspect ratio
+                                child: setNetworkImg(
+                                  boxFit: BoxFit.cover,
+                                  image: context
+                                          .read<ProductDetailProvider>()
+                                          .images[
+                                      context
+                                          .read<ProductDetailProvider>()
+                                          .currentImage],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               );
             },
           ),
         ),
-        ProductDetailImportantInformationWidget(context, widget.product),
-        getSizedBox(height: Constant.size10),
+
+        // Enhanced Product Information Card
         Container(
-          margin: EdgeInsetsDirectional.only(
-            start: 10,
-            end: 10,
-            bottom: 10,
-          ),
-          decoration: DesignConfig.boxDecoration(
-            Theme.of(context).cardColor,
-            10,
-          ),
-          child: ExpansionTile(
-            collapsedShape:
-                ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-            shape: ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-            initiallyExpanded: true,
-            title: CustomTextLabel(
-              jsonKey: "product_specifications",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: ColorsRes.mainTextColor,
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
-            ),
-            iconColor: ColorsRes.mainTextColor,
-            collapsedIconColor: ColorsRes.mainTextColor,
-            children: [
-              Padding(
-                padding: const EdgeInsetsDirectional.only(
-                  start: 5,
-                  end: 5,
-                  bottom: 10,
+            ],
+          ),
+          child: Consumer<SelectedVariantItemProvider>(
+            builder: (context, selectedVariantItemProvider, _) {
+              return Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Product Name with better typography
+                    CustomTextLabel(
+                      text: widget.product.name,
+                      softWrap: true,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: ColorsRes.mainTextColor,
+                        height: 1.3,
+                      ),
+                    ),
+
+                    SizedBox(height: 12),
+
+                    // Enhanced Price and Rating Row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Price Section
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Current Price
+                              CustomTextLabel(
+                                text: double.parse(widget
+                                            .product
+                                            .variants[
+                                                selectedVariantItemProvider
+                                                    .getSelectedIndex()]
+                                            .discountedPrice) !=
+                                        0
+                                    ? widget
+                                        .product
+                                        .variants[selectedVariantItemProvider
+                                            .getSelectedIndex()]
+                                        .discountedPrice
+                                        .currency
+                                    : widget
+                                        .product
+                                        .variants[selectedVariantItemProvider
+                                            .getSelectedIndex()]
+                                        .price
+                                        .currency,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: ColorsRes.appColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+
+                              // Original Price (if discounted)
+                              if (double.parse(widget
+                                      .product.variants[0].discountedPrice) !=
+                                  0) ...[
+                                SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    CustomTextLabel(
+                                      text: widget
+                                          .product.variants[0].price.currency,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: ColorsRes.grey,
+                                        decoration: TextDecoration.lineThrough,
+                                        decorationThickness: 2,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Colors.green.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: CustomTextLabel(
+                                        text:
+                                            "${((double.parse(widget.product.variants[0].price) - double.parse(widget.product.variants[0].discountedPrice)) / double.parse(widget.product.variants[0].price) * 100).toStringAsFixed(0)}% OFF",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.green.shade700,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        // Enhanced Rating Section
+                        if (context
+                                .read<RatingListProvider>()
+                                .totalData
+                                .toString()
+                                .toInt >
+                            0)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: ColorsRes.appColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    ColorsRes.appColor.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                ProductListRatingBuilderWidget(
+                                  averageRating: context
+                                      .read<RatingListProvider>()
+                                      .productRatingData
+                                      .averageRating
+                                      .toString()
+                                      .toDouble,
+                                  totalRatings: context
+                                      .read<RatingListProvider>()
+                                      .totalData
+                                      .toString()
+                                      .toInt,
+                                  size: 14,
+                                  spacing: 1,
+                                ),
+                                SizedBox(height: 2),
+                                CustomTextLabel(
+                                  text:
+                                      "${context.read<RatingListProvider>().totalData} reviews",
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: ColorsRes.appColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    SizedBox(height: 16),
+
+                    // Enhanced Add to Cart Button
+                    ProductDetailAddToCartButtonWidget(
+                      context: context,
+                      product: widget.product,
+                    ),
+                  ],
                 ),
-                child: Container(
-                  margin: EdgeInsetsDirectional.all(10),
+              );
+            },
+          ),
+        ),
+        // Important Information Widget
+        ProductDetailImportantInformationWidget(context, widget.product),
+
+        SizedBox(height: 8),
+
+        // Enhanced Product Specifications Card
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              childrenPadding: EdgeInsets.zero,
+              backgroundColor: Theme.of(context).cardColor,
+              collapsedBackgroundColor: Theme.of(context).cardColor,
+              collapsedShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              initiallyExpanded: true,
+              title: CustomTextLabel(
+                jsonKey: "product_specifications",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: ColorsRes.mainTextColor,
+                ),
+              ),
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      ColorsRes.appColor.withValues(alpha: 0.2),
+                      ColorsRes.appColor.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  color: ColorsRes.appColor,
+                  size: 20,
+                ),
+              ),
+              iconColor: ColorsRes.mainTextColor,
+              collapsedIconColor: ColorsRes.mainTextColor,
+              children: [
+                Container(
+                  margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
                   child: Column(
                     children: [
                       getSpecificationItem(
@@ -317,218 +430,270 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                     ],
                   ),
                 ),
+              ],
+            ),
+          ),
+        ),
+
+        // Enhanced Product Overview Card
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
             ],
           ),
-        ),
-        Container(
-          margin: EdgeInsetsDirectional.only(
-            start: 10,
-            end: 10,
-            bottom: 10,
-          ),
-          decoration: DesignConfig.boxDecoration(
-            Theme.of(context).cardColor,
-            10,
-          ),
-          child: ExpansionTile(
-            collapsedShape:
-                ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-            shape: ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-            initiallyExpanded: true,
-            title: CustomTextLabel(
-              jsonKey: "product_overview",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: ColorsRes.mainTextColor,
-              ),
-            ),
-            iconColor: ColorsRes.mainTextColor,
-            collapsedIconColor: ColorsRes.mainTextColor,
-            maintainState: true,
-            children: [
-              Padding(
-                padding: const EdgeInsetsDirectional.only(
-                  start: 5,
-                  end: 5,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              childrenPadding: EdgeInsets.zero,
+              backgroundColor: Theme.of(context).cardColor,
+              collapsedBackgroundColor: Theme.of(context).cardColor,
+              collapsedShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              initiallyExpanded: true,
+              title: CustomTextLabel(
+                jsonKey: "product_overview",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: ColorsRes.mainTextColor,
                 ),
-                child: Container(
-                  margin: EdgeInsetsDirectional.all(10),
-                  child: QuillHtmlEditor(
-                    text: widget.product.description,
-                    hintText:
-                        getTranslatedValue(context, "description_goes_here"),
-                    isEnabled: true,
-                    ensureVisible: true,
-                    minHeight: 10,
-                    autoFocus: false,
-                    textStyle: TextStyle(color: ColorsRes.mainTextColor),
-                    hintTextStyle:
-                        TextStyle(color: ColorsRes.subTitleMainTextColor),
-                    padding: const EdgeInsets.only(left: 10, top: 10),
-                    backgroundColor: Theme.of(context).cardColor,
-                    loadingBuilder: (context) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: ColorsRes.appColor,
-                        ),
-                      );
-                    },
-                    controller: quillEditorController,
+              ),
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.blue.withValues(alpha: 0.2),
+                      Colors.blue.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.description_outlined,
+                  color: Colors.blue.shade600,
+                  size: 20,
+                ),
+              ),
+              iconColor: ColorsRes.mainTextColor,
+              collapsedIconColor: ColorsRes.mainTextColor,
+              maintainState: true,
+              children: [
+                Container(
+                  margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: CustomTextLabel(
+                    text: widget.product.description
+                        .replaceAll(RegExp(r'<[^>]*>'), ''), // Remove HTML tags
+                    softWrap: true,
+                    style: TextStyle(
+                      color: ColorsRes.mainTextColor,
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+        // Enhanced Ratings and Reviews Section
         Consumer<RatingListProvider>(
           builder: (context, ratingListProvider, child) {
             if (ratingListProvider.ratings.length > 0) {
               return Container(
-                margin: EdgeInsetsDirectional.only(
-                  start: 10,
-                  end: 10,
-                  bottom: 10,
-                ),
-                decoration: DesignConfig.boxDecoration(
-                  Theme.of(context).cardColor,
-                  10,
-                ),
-                child: ExpansionTile(
-                  collapsedShape:
-                      ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-                  shape:
-                      ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-                  initiallyExpanded: true,
-                  title: CustomTextLabel(
-                    jsonKey: "ratings_and_reviews",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: ColorsRes.mainTextColor,
+                margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
                     ),
-                  ),
-                  iconColor: ColorsRes.mainTextColor,
-                  collapsedIconColor: ColorsRes.mainTextColor,
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsDirectional.symmetric(horizontal: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          getOverallRatingSummary(
-                              context: context,
-                              productRatingData:
-                                  ratingListProvider.productRatingData,
-                              totalRatings:
-                                  ratingListProvider.totalData.toString()),
-                          if (ratingListProvider.totalImages > 0)
-                            getSizedBox(height: 20),
-                          if (ratingListProvider.totalImages > 0)
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: ExpansionTile(
+                    tilePadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    childrenPadding: EdgeInsets.zero,
+                    backgroundColor: Theme.of(context).cardColor,
+                    collapsedBackgroundColor: Theme.of(context).cardColor,
+                    collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    initiallyExpanded: true,
+                    title: CustomTextLabel(
+                      jsonKey: "ratings_and_reviews",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: ColorsRes.mainTextColor,
+                      ),
+                    ),
+                    leading: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.star_outline_rounded,
+                        color: Colors.amber.shade700,
+                        size: 20,
+                      ),
+                    ),
+                    iconColor: ColorsRes.appColor,
+                    collapsedIconColor: ColorsRes.appColor,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withValues(alpha: 0.02),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            getOverallRatingSummary(
+                                context: context,
+                                productRatingData:
+                                    ratingListProvider.productRatingData,
+                                totalRatings:
+                                    ratingListProvider.totalData.toString()),
+                            if (ratingListProvider.totalImages > 0) ...[
+                              SizedBox(height: 20),
+                              CustomTextLabel(
+                                text:
+                                    "${getTranslatedValue(context, "customer_photos")}(${ratingListProvider.totalImages})",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorsRes.mainTextColor,
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              RatingImagesWidget(
+                                images: ratingListProvider.images,
+                                from: "productDetails",
+                                productId: widget.product.id,
+                                totalImages: ratingListProvider.totalImages,
+                              ),
+                            ],
+                            SizedBox(height: 20),
                             CustomTextLabel(
-                              text:
-                                  "${getTranslatedValue(context, "customer_photos")}(${ratingListProvider.totalImages})",
+                              jsonKey: "customer_reviews",
                               style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                                 color: ColorsRes.mainTextColor,
                               ),
                             ),
-                          if (ratingListProvider.totalImages > 0)
-                            getSizedBox(height: 20),
-                          if (ratingListProvider.totalImages > 0)
-                            RatingImagesWidget(
-                              images: ratingListProvider.images,
-                              from: "productDetails",
-                              productId: widget.product.id,
-                              totalImages: ratingListProvider.totalImages,
-                            ),
-                          getSizedBox(height: 20),
-                          CustomTextLabel(
-                            jsonKey: "customer_reviews",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: ColorsRes.mainTextColor,
-                            ),
-                          ),
-                          getSizedBox(height: 20),
-                          ListView(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            children: List.generate(
-                              ratingListProvider.ratings.length,
-                              (index) {
-                                ProductRatingList rating =
-                                    ratingListProvider.ratings[index];
-                                return Column(
-                                  children: [
-                                    getRatingReviewItem(rating: rating),
-                                    getSizedBox(height: 10),
-                                    getDivider(
-                                      color: ColorsRes.grey.withValues(alpha:0.5),
-                                      height: 0,
-                                      endIndent: 0,
-                                      indent: 0,
-                                    ),
-                                    getSizedBox(height: 10),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          if (ratingListProvider.totalData > 5)
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, ratingAndReviewScreen,
-                                    arguments: widget.product.id.toString());
-                              },
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.only(
-                                  top: 10,
-                                  end: 10,
-                                  bottom: 10,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        border: BorderDirectional(
-                                          bottom: BorderSide(
-                                              color: ColorsRes.mainTextColor),
+                            SizedBox(height: 16),
+                            ListView(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.zero,
+                              children: List.generate(
+                                ratingListProvider.ratings.length,
+                                (index) {
+                                  ProductRatingList rating =
+                                      ratingListProvider.ratings[index];
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).cardColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: Colors.grey
+                                                .withValues(alpha: 0.15),
+                                            width: 1,
+                                          ),
                                         ),
+                                        child:
+                                            getRatingReviewItem(rating: rating),
                                       ),
-                                      child: CustomTextLabel(
+                                      if (index <
+                                          ratingListProvider.ratings.length - 1)
+                                        SizedBox(height: 12),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            if (ratingListProvider.totalData > 5) ...[
+                              SizedBox(height: 16),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, ratingAndReviewScreen,
+                                      arguments: widget.product.id.toString());
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: ColorsRes.appColor
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: ColorsRes.appColor
+                                          .withValues(alpha: 0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CustomTextLabel(
                                         text:
                                             "${getTranslatedValue(context, "view_all_reviews_title")} ${ratingListProvider.totalData.toString().toInt} ${getTranslatedValue(context, "reviews")}",
                                         style: TextStyle(
-                                          color: ColorsRes.mainTextColor,
+                                          color: ColorsRes.appColor,
                                           fontSize: 15,
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                    ),
-                                    getSizedBox(width: 5),
-                                    Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      color: ColorsRes.mainTextColor,
-                                      size: 13,
-                                    ),
-                                  ],
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                      SizedBox(width: 8),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: ColorsRes.appColor,
+                                        size: 14,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          getSizedBox(height: 10),
-                        ],
+                            ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             } else {
@@ -536,6 +701,8 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
             }
           },
         ),
+
+        // Similar Products Section
         ChangeNotifierProvider<ProductListProvider>(
           create: (context) => ProductListProvider(),
           child: ProductDetailSimilarProductsWidget(
@@ -547,10 +714,9 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
             slug: context.read<ProductDetailProvider>().productDetail.data.slug,
           ),
         ),
-        getSizedBox(
-          height:
-              context.watch<ProductDetailProvider>().expanded == true ? 60 : 10,
-        ),
+
+        // Bottom spacing
+        SizedBox(height: 20),
       ],
     );
   }
@@ -563,49 +729,60 @@ Widget getSpecificationItem({
   required bool isClickable,
 }) {
   if (value != "null" && value != "") {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: CustomTextLabel(
-                jsonKey: titleJson,
-                softWrap: true,
-                style: TextStyle(
-                  color: ColorsRes.subTitleMainTextColor,
-                ),
-              ),
-            ),
-            getSizedBox(width: 10),
-            CustomTextLabel(
-              text: ":",
+    return Container(
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.withValues(alpha: 0.15),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: CustomTextLabel(
+              jsonKey: titleJson,
               softWrap: true,
               style: TextStyle(
                 color: ColorsRes.subTitleMainTextColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            getSizedBox(width: 10),
-            Expanded(
-              flex: 7,
-              child: GestureDetector(
-                onTap: voidCallback,
-                child: CustomTextLabel(
-                  text: value,
-                  softWrap: true,
-                  style: TextStyle(
-                    color: isClickable
-                        ? Colors.blueAccent
-                        : ColorsRes.mainTextColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            flex: 5,
+            child: GestureDetector(
+              onTap: voidCallback,
+              child: CustomTextLabel(
+                text: value,
+                softWrap: true,
+                textAlign: TextAlign.end,
+                style: TextStyle(
+                  color: isClickable
+                      ? ColorsRes.appColor
+                      : ColorsRes.mainTextColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
               ),
             ),
+          ),
+          if (isClickable) ...[
+            SizedBox(width: 8),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: ColorsRes.appColor,
+              size: 12,
+            ),
           ],
-        ),
-        getSizedBox(height: 10),
-      ],
+        ],
+      ),
     );
   } else {
     return SizedBox.shrink();

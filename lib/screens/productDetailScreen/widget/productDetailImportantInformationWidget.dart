@@ -7,79 +7,137 @@ Widget ProductDetailImportantInformationWidget(
   String productType = product.indicator.toString();
   String cancelableStatus = product.cancelableStatus.toString();
   String returnStatus = product.returnStatus.toString();
+
   return Container(
-    padding: EdgeInsetsDirectional.all(10),
-    margin: EdgeInsetsDirectional.only(top: 10, start: 10, end: 10),
-    decoration: DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
-    child: Column(
-      children: [
-        if (productType != "null" && productType != "0")
+    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 8,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Padding(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
           Row(
             children: [
-              defaultImg(
-                height: 22,
-                width: 22,
-                image: productType == "1"
-                    ? "product_veg_indicator"
-                    : "product_non_veg_indicator",
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.blue.shade700,
+                  size: 20,
+                ),
               ),
-              getSizedBox(width: 10),
+              SizedBox(width: 12),
               CustomTextLabel(
-                jsonKey: productType == "1" ? "vegetarian" : "non_vegetarian",
+                text: "Important Information",
                 style: TextStyle(
-                  color: ColorsRes.subTitleMainTextColor,
-                  fontSize: 16,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: ColorsRes.mainTextColor,
                 ),
               ),
             ],
           ),
-        getSizedBox(height: Constant.size10),
-        Row(
-          children: [
-            defaultImg(
-              height: 22,
-              width: 22,
-              image: cancelableStatus == "1"
-                  ? "product_cancellable"
-                  : "product_non_cancellable",
+
+          SizedBox(height: 16),
+
+          // Information Items
+          if (productType != "null" && productType != "0")
+            _buildInfoItem(
+              context,
+              icon: productType == "1"
+                  ? "product_veg_indicator"
+                  : "product_non_veg_indicator",
+              text: getTranslatedValue(context,
+                  productType == "1" ? "vegetarian" : "non_vegetarian"),
+              color: productType == "1" ? Colors.green : Colors.red,
             ),
-            getSizedBox(width: 10),
-            Expanded(
-              child: CustomTextLabel(
-                text: (cancelableStatus == "1")
-                    ? "${getTranslatedValue(context, "product_is_cancellable_till")} ${Constant.getOrderActiveStatusLabelFromCode(product.tillStatus, context)}"
-                    : getTranslatedValue(context, "non_cancellable"),
-                style: TextStyle(
-                  color: ColorsRes.subTitleMainTextColor,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
+
+          _buildInfoItem(
+            context,
+            icon: cancelableStatus == "1"
+                ? "product_cancellable"
+                : "product_non_cancellable",
+            text: (cancelableStatus == "1")
+                ? "${getTranslatedValue(context, "product_is_cancellable_till")} ${Constant.getOrderActiveStatusLabelFromCode(product.tillStatus, context)}"
+                : getTranslatedValue(context, "non_cancellable"),
+            color: cancelableStatus == "1" ? Colors.orange : Colors.red,
+          ),
+
+          _buildInfoItem(
+            context,
+            icon: returnStatus == "1"
+                ? "product_returnable"
+                : "product_non_returnable",
+            text: (returnStatus == "1")
+                ? "${getTranslatedValue(context, "product_is_returnable_till")} ${product.returnDays} ${getTranslatedValue(context, "days")}"
+                : getTranslatedValue(context, "non_returnable"),
+            color: returnStatus == "1" ? Colors.green : Colors.red,
+            isLast: true,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildInfoItem(
+  BuildContext context, {
+  required String icon,
+  required String text,
+  required Color color,
+  bool isLast = false,
+}) {
+  return Container(
+    margin: EdgeInsets.only(bottom: isLast ? 0 : 12),
+    padding: EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.05),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(
+        color: color.withValues(alpha: 0.2),
+        width: 1,
+      ),
+    ),
+    child: Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: defaultImg(
+            height: 16,
+            width: 16,
+            image: icon,
+            iconColor: color,
+          ),
         ),
-        getSizedBox(height: Constant.size10),
-        Row(
-          children: [
-            defaultImg(
-              height: 22,
-              width: 22,
-              image: returnStatus == "1"
-                  ? "product_returnable"
-                  : "product_non_returnable",
+        SizedBox(width: 12),
+        Expanded(
+          child: CustomTextLabel(
+            text: text,
+            style: TextStyle(
+              color: ColorsRes.mainTextColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-            getSizedBox(width: 10),
-            Expanded(
-              child: CustomTextLabel(
-                text: (returnStatus == "1")
-                    ? "${getTranslatedValue(context, "product_is_returnable_till")} ${product.returnDays} ${getTranslatedValue(context, "days")}"
-                    : getTranslatedValue(context, "non_returnable"),
-                style: TextStyle(
-                  color: ColorsRes.subTitleMainTextColor,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     ),

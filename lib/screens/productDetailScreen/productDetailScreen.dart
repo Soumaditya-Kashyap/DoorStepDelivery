@@ -17,26 +17,12 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   ScrollController scrollController = ScrollController();
 
-  scrollListener() {
-    // _scrollController detects weather screen scroll done 30% or scrolled more then 600px then bottom add to cart button will be visible
-    if (scrollController.position.pixels > 600) {
-      if (mounted) {
-        context.read<ProductDetailProvider>().changeVisibility(true);
-      }
-    } else {
-      if (mounted) {
-        context.read<ProductDetailProvider>().changeVisibility(false);
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     //fetch productList from api
     Future.delayed(Duration.zero).then((value) async {
       if (mounted) {
-        scrollController.addListener(scrollListener);
         try {
           Map<String, String> params =
               await Constant.getProductsDefaultParams();
@@ -177,52 +163,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ProductDetailState.loaded) {
                 return ChangeNotifierProvider<SelectedVariantItemProvider>(
                   create: (context) => SelectedVariantItemProvider(),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: scrollController,
-                          child: ProductDetailWidget(
-                            context: context,
-                            product: productDetailProvider.productDetail.data,
-                          ),
-                        ),
-                      ),
-                      AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        width: context.width,
-                        // Example width
-                        height: productDetailProvider.expanded == true ? 70 : 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadiusDirectional.only(
-                              topStart: Radius.circular(10),
-                              topEnd: Radius.circular(10),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: ColorsRes.subTitleMainTextColor,
-                                offset: Offset(1, 1),
-                                blurRadius: 5,
-                                spreadRadius: 0.1,
-                              )
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadiusDirectional.only(
-                              topStart: Radius.circular(10),
-                              topEnd: Radius.circular(10),
-                            ),
-                            child: ProductDetailAddToCartButtonWidget(
-                                context: context,
-                                product: productDetailProvider.productData,
-                                bgColor: Theme.of(context).cardColor,
-                                padding: 10),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: ProductDetailWidget(
+                      context: context,
+                      product: productDetailProvider.productDetail.data,
+                    ),
                   ),
                 );
               } else if (productDetailProvider.productDetailState ==
@@ -233,14 +179,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               } else if (productDetailProvider.productDetailState ==
                   ProductDetailState.error) {
                 return DefaultBlankItemMessageScreen(
-                  title: getTranslatedValue(
-          context,"oops"),
-                  description:
-                      getTranslatedValue(
-          context,"product_is_either_unavailable_or_does_not_exist"),
+                  title: getTranslatedValue(context, "oops"),
+                  description: getTranslatedValue(context,
+                      "product_is_either_unavailable_or_does_not_exist"),
                   image: "no_product_icon",
-                  buttonTitle: getTranslatedValue(
-          context,"go_back"),
+                  buttonTitle: getTranslatedValue(context, "go_back"),
                   callback: () {
                     Navigator.pop(context);
                   },
@@ -287,9 +230,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           if (context.watch<CartProvider>().totalItemsCount > 0)
             PositionedDirectional(
-              bottom: context.watch<ProductDetailProvider>().expanded == true
-                  ? 70
-                  : 0,
+              bottom: 0,
               start: 0,
               end: 0,
               child: CartOverlay(),

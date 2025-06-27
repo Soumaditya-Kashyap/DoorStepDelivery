@@ -79,68 +79,98 @@ class _ProductDetailSimilarProductsWidgetState
         if (productListProvider.products.length > 0 &&
             (productListProvider.productState == ProductState.loaded ||
                 productListProvider.productState == ProductState.loadingMore)) {
-          return Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(8),
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
-                margin: EdgeInsetsDirectional.only(
-                  start: Constant.size10,
-                  end: Constant.size10,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 15,
-                  ),
-                  child: Container(
-                    width: context.width,
-                    child: CustomTextLabel(
-                      jsonKey: "similar_products",
-                      softWrap: true,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: ColorsRes.mainTextColor,
+              ],
+            ),
+            child: Column(
+              children: [
+                // Enhanced Header
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              ColorsRes.appColor.withValues(alpha: 0.2),
+                              ColorsRes.appColor.withValues(alpha: 0.1),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.recommend_outlined,
+                          color: ColorsRes.appColor,
+                          size: 20,
+                        ),
                       ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: CustomTextLabel(
+                          jsonKey: "similar_products",
+                          softWrap: true,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: ColorsRes.mainTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Enhanced Products List with Fixed Dimensions
+                Container(
+                  height: 240, // Increased height for better product display
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      children: List.generate(
+                          productListProvider.products.length, (index) {
+                        ProductListItem product =
+                            productListProvider.products[index];
+                        return Container(
+                          width: 160, // Fixed width to prevent overflow
+                          margin: EdgeInsets.only(right: 12),
+                          child: ProductGridItemContainer(
+                            product: product,
+                          ),
+                        );
+                      })
+                        ..addAll([
+                          if (productListProvider.productState ==
+                              ProductState.loadingMore)
+                            Container(
+                              width: 160,
+                              margin: EdgeInsets.only(right: 12),
+                              child: getProductItemShimmer(
+                                  context: context, isGrid: true),
+                            ),
+                        ]),
                     ),
                   ),
                 ),
-              ),
-              getSizedBox(height: 5),
-              SingleChildScrollView(
-                controller: scrollController,
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  constraints: BoxConstraints(minWidth: context.width),
-                  alignment: AlignmentDirectional.centerStart,
-                  padding: EdgeInsetsDirectional.symmetric(horizontal: 5),
-                  child: Row(
-                    children: List.generate(productListProvider.products.length,
-                        (index) {
-                      ProductListItem product =
-                          productListProvider.products[index];
-                      return Row(
-                        children: [
-                          HomeScreenProductListItem(
-                            product: product,
-                            position: index,
-                          ),
-                          if (productListProvider.productState ==
-                              ProductState.loadingMore)
-                            getProductItemShimmer(
-                                context: context, isGrid: true),
-                        ],
-                      );
-                    }),
-                  ),
-                ),
-              ),
-            ],
+
+                SizedBox(height: 8),
+              ],
+            ),
           );
         } else if (productListProvider.productState == ProductState.loading) {
           return Container();

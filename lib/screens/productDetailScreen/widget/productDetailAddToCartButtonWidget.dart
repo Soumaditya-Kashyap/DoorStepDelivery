@@ -10,15 +10,21 @@ Widget ProductDetailAddToCartButtonWidget({
     color: bgColor,
     padding:
         EdgeInsetsDirectional.only(top: padding ?? 0, bottom: padding ?? 0),
-    child: Row(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: Padding(
-            padding: EdgeInsetsDirectional.only(start: padding ?? 0),
-            child: GestureDetector(
-              onTap: () {
-                if (product.variants.length > 1) {
-                  {
+        // Variant Selector Section
+        Consumer<SelectedVariantItemProvider>(
+          builder: (context, selectedVariantItemProvider, _) {
+            return Padding(
+              padding: EdgeInsetsDirectional.only(
+                start: padding ?? 0,
+                end: padding ?? 0,
+                bottom: 12,
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  if (product.variants.length > 1) {
                     showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
@@ -56,9 +62,7 @@ Widget ProductDetailAddToCartButtonWidget({
                                             image: product.imageUrl,
                                             height: 70,
                                             width: 70)),
-                                    getSizedBox(
-                                      width: Constant.size10,
-                                    ),
+                                    getSizedBox(width: Constant.size10),
                                     Expanded(
                                       child: CustomTextLabel(
                                         text: product.name,
@@ -84,137 +88,134 @@ Widget ProductDetailAddToCartButtonWidget({
                                   itemCount: product.variants.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-                                                child: RichText(
-                                                  maxLines: 2,
-                                                  softWrap: true,
-                                                  overflow: TextOverflow.clip,
-                                                  // maxLines: 1,
-                                                  text: TextSpan(children: [
-                                                    TextSpan(
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: ColorsRes
-                                                              .mainTextColor,
-                                                          decorationThickness:
-                                                              2),
-                                                      text:
-                                                          "${product.variants[index].measurement} ",
-                                                    ),
-                                                    WidgetSpan(
-                                                      child: CustomTextLabel(
-                                                        text: product
-                                                            .variants[index]
-                                                            .stockUnitName,
-                                                        softWrap: true,
-                                                        //superscript is usually smaller in size
-                                                        // textScaleFactor: 0.7,
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          color: ColorsRes
-                                                              .mainTextColor,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                        text: double.parse(product
-                                                                    .variants[
-                                                                        index]
-                                                                    .discountedPrice) !=
-                                                                0
-                                                            ? " | "
-                                                            : "",
-                                                        style: TextStyle(
-                                                            color: ColorsRes
-                                                                .mainTextColor)),
-                                                    TextSpan(
-                                                      style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: ColorsRes.grey,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough,
-                                                          decorationThickness:
-                                                              2),
-                                                      text: double.parse(product
-                                                                  .variants[
-                                                                      index]
-                                                                  .discountedPrice) !=
-                                                              0
-                                                          ? product
-                                                              .variants[index]
-                                                              .price
-                                                              .currency
-                                                          : "",
-                                                    ),
-                                                  ]),
-                                                ),
-                                              ),
-                                              CustomTextLabel(
-                                                text: double.parse(product
-                                                            .variants[index]
-                                                            .discountedPrice) !=
-                                                        0
-                                                    ? product
-                                                        .variants[index]
-                                                        .discountedPrice
-                                                        .currency
-                                                    : product.variants[index]
-                                                        .price.currency,
-                                                softWrap: true,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    fontSize: 17,
-                                                    color: ColorsRes.appColor,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ],
+                                    return GestureDetector(
+                                      onTap: () {
+                                        context
+                                            .read<SelectedVariantItemProvider>()
+                                            .setSelectedIndex(index);
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: selectedVariantItemProvider
+                                                      .getSelectedIndex() ==
+                                                  index
+                                              ? ColorsRes.appColor
+                                                  .withValues(alpha: 0.1)
+                                              : Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: selectedVariantItemProvider
+                                                        .getSelectedIndex() ==
+                                                    index
+                                                ? ColorsRes.appColor
+                                                : Colors.grey
+                                                    .withValues(alpha: 0.3),
+                                            width: selectedVariantItemProvider
+                                                        .getSelectedIndex() ==
+                                                    index
+                                                ? 2
+                                                : 1,
                                           ),
                                         ),
-                                        ProductCartButton(
-                                          productId: product.id.toString(),
-                                          productVariantId: product
-                                              .variants[index].id
-                                              .toString(),
-                                          count: int.parse(product
-                                                      .variants[index]
-                                                      .status) ==
-                                                  0
-                                              ? -1
-                                              : int.parse(product
-                                                  .variants[index].cartCount),
-                                          isUnlimitedStock:
-                                              product.isUnlimitedStock == "1",
-                                          maximumAllowedQuantity: double.parse(
-                                              product.totalAllowedQuantity
-                                                  .toString()),
-                                          availableStock: double.parse(
-                                              product.variants[index].stock),
-                                          isGrid: false,
-                                          sellerId: product.sellerId.toString(),
-                                          from: "product_details",
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Flexible(
+                                                        child: CustomTextLabel(
+                                                          text:
+                                                              "${product.variants[index].measurement} ${product.variants[index].stockUnitName}",
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: ColorsRes
+                                                                .mainTextColor,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ),
+                                                      if (double.parse(product
+                                                              .variants[index]
+                                                              .discountedPrice) !=
+                                                          0) ...[
+                                                        SizedBox(width: 8),
+                                                        CustomTextLabel(
+                                                          text: product
+                                                              .variants[index]
+                                                              .price
+                                                              .currency,
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                ColorsRes.grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .lineThrough,
+                                                            decorationThickness:
+                                                                2,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  CustomTextLabel(
+                                                    text: double.parse(product
+                                                                .variants[index]
+                                                                .discountedPrice) !=
+                                                            0
+                                                        ? product
+                                                            .variants[index]
+                                                            .discountedPrice
+                                                            .currency
+                                                        : product
+                                                            .variants[index]
+                                                            .price
+                                                            .currency,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: ColorsRes.appColor,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            if (selectedVariantItemProvider
+                                                    .getSelectedIndex() ==
+                                                index)
+                                              Container(
+                                                padding: EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: ColorsRes.appColor,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.check,
+                                                  color: Colors.white,
+                                                  size: 16,
+                                                ),
+                                              ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     );
                                   },
                                   separatorBuilder:
                                       (BuildContext context, int index) {
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: Constant.size7),
-                                      child: getDivider(
-                                        color: ColorsRes.grey,
-                                        height: 5,
-                                      ),
-                                    );
+                                    return SizedBox(height: 8);
                                   },
                                 ),
                               ),
@@ -224,56 +225,86 @@ Widget ProductDetailAddToCartButtonWidget({
                       },
                     );
                   }
-                }
-              },
-              child: Container(
-                margin: EdgeInsetsDirectional.only(end: 10),
-                decoration: BoxDecoration(
-                  borderRadius: Constant.borderRadius5,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
+                },
                 child: Container(
-                  padding: product.variants.length > 1
-                      ? EdgeInsets.zero
-                      : EdgeInsets.all(5),
-                  alignment: AlignmentDirectional.center,
-                  height: 35,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (product.variants.length > 1) Spacer(),
-                      CustomTextLabel(
-                        text:
-                            "${product.variants[0].measurement} ${product.variants[0].stockUnitName}",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: ColorsRes.mainTextColor,
-                        ),
-                      ),
-                      if (product.variants.length > 1) Spacer(),
-                      if (product.variants.length > 1)
-                        Padding(
-                          padding: EdgeInsetsDirectional.only(start: 5, end: 5),
-                          child: defaultImg(
-                            image: "ic_drop_down",
-                            height: 10,
-                            width: 10,
-                            boxFit: BoxFit.cover,
-                            iconColor: ColorsRes.mainTextColor,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    border: Border.all(
+                      color: Colors.grey.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CustomTextLabel(
+                                text: "Size : ",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: ColorsRes.subTitleMainTextColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Flexible(
+                                child: CustomTextLabel(
+                                  text:
+                                      "${product.variants[selectedVariantItemProvider.getSelectedIndex()].measurement} ${product.variants[selectedVariantItemProvider.getSelectedIndex()].stockUnitName}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: ColorsRes.mainTextColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                    ],
+                        if (product.variants.length > 1) ...[
+                          SizedBox(width: 8),
+                          Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: ColorsRes.appColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: defaultImg(
+                              image: "ic_drop_down",
+                              height: 12,
+                              width: 12,
+                              boxFit: BoxFit.cover,
+                              iconColor: ColorsRes.appColor,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsetsDirectional.only(end: padding ?? 0),
+
+        // Add to Cart Button Section
+        Padding(
+          padding: EdgeInsetsDirectional.only(
+            start: padding ?? 0,
+            end: padding ?? 0,
+          ),
+          child: Container(
+            height: 56,
             child: Consumer<SelectedVariantItemProvider>(
                 builder: (context, selectedVariantItemProvider, _) {
               return ProductCartButton(

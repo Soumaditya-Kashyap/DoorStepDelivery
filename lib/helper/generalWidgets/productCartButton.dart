@@ -251,10 +251,13 @@ class _ProductCartButtonState
                   padding: EdgeInsets.symmetric(horizontal: Constant.size10),
                   decoration: BoxDecoration(
                     color: ColorsRes.appColorLightHalfTransparent,
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  height: 35,
-                  width: context.width * 0.25,
+                  height:
+                      widget.from == "product_details" ? double.infinity : 35,
+                  width: widget.from == "product_details"
+                      ? double.infinity
+                      : context.width * 0.25,
                   child: (cartListProvider.cartListState ==
                               CartListState.loading &&
                           cartListProvider.currentSelectedProduct ==
@@ -272,7 +275,7 @@ class _ProductCartButtonState
                           ),
                         )
                       : FittedBox(
-                          fit: BoxFit.fill,
+                          fit: BoxFit.scaleDown,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -280,13 +283,17 @@ class _ProductCartButtonState
                               defaultImg(
                                 image: "product_cart_icon",
                                 iconColor: ColorsRes.appColor,
+                                height: 20,
+                                width: 20,
                               ),
-                              getSizedBox(width: 5),
+                              getSizedBox(width: 8),
                               CustomTextLabel(
                                 jsonKey: "add_to_cart",
                                 style: TextStyle(
-                                  color:
-                                      ColorsRes.mainTextColor.withValues(alpha: 0.8),
+                                  color: ColorsRes.mainTextColor
+                                      .withValues(alpha: 0.8),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -299,13 +306,17 @@ class _ProductCartButtonState
                         0 &&
                     widget.count != -1)
                 ? Container(
-                    height: 35,
-                    width: context.width * 0.25,
+                    height:
+                        widget.from == "product_details" ? double.infinity : 35,
+                    width: widget.from == "product_details"
+                        ? double.infinity
+                        : context.width * 0.25,
                     decoration: BoxDecoration(
                       gradient: DesignConfig.linearGradient(
                           ColorsRes.appColor, ColorsRes.appColor),
                       borderRadius: BorderRadiusDirectional.all(
-                        Radius.circular(5),
+                        Radius.circular(
+                            widget.from == "product_details" ? 12 : 5),
                       ),
                     ),
                     child: Row(
