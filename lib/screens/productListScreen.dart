@@ -115,12 +115,31 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 context: context,
               ),
               getSizedBox(
-                height: Constant.size5,
+                height: 3,
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                  border: Border.all(
+                    color:
+                        ColorsRes.subTitleMainTextColor.withValues(alpha: 0.08),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Enhanced Filter Button
+                    Expanded(
                       child: GestureDetector(
                         onTap: () async {
                           Navigator.pushNamed(
@@ -173,248 +192,388 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           });
                         },
                         child: Container(
-                            margin:
-                                EdgeInsetsDirectional.only(start: 10, end: 5),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                defaultImg(
-                                    image: "filter_icon",
-                                    height: 17,
-                                    width: 17,
-                                    padding: const EdgeInsetsDirectional.only(
-                                        top: 7, bottom: 7, end: 7),
-                                    iconColor: Theme.of(context).primaryColor),
-                                CustomTextLabel(
-                                  jsonKey: "filter",
-                                  softWrap: true,
-                                )
-                              ],
-                            )),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet<void>(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: DesignConfig.setRoundedBorderSpecific(20,
-                              istop: true),
-                          builder: (BuildContext context1) {
-                            return Wrap(
-                              children: [
-                                Container(
-                                  decoration: DesignConfig.boxDecoration(
-                                      Theme.of(context).cardColor, 10),
-                                  padding: const EdgeInsets.all(15),
-                                  child: Column(
-                                    children: [
-                                      Stack(
-                                        children: [
-                                          PositionedDirectional(
-                                            child: GestureDetector(
-                                              onTap: () =>
-                                                  Navigator.pop(context),
-                                              child: Padding(
-                                                padding: EdgeInsets.all(10),
-                                                child: defaultImg(
-                                                  image: "ic_arrow_back",
-                                                  iconColor:
-                                                      ColorsRes.mainTextColor,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Center(
-                                            child: CustomTextLabel(
-                                              jsonKey: "sort_by",
-                                              softWrap: true,
-                                              textAlign: TextAlign.center,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium!
-                                                  .merge(
-                                                    TextStyle(
-                                                      letterSpacing: 0.5,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: ColorsRes
-                                                          .mainTextColor,
-                                                    ),
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+                          decoration: BoxDecoration(
+                            color: isFilterApplied
+                                ? ColorsRes.appColor.withValues(alpha: 0.08)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Stack(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: isFilterApplied
+                                          ? ColorsRes.appColor
+                                          : ColorsRes.appColor
+                                              .withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: defaultImg(
+                                      image: "filter_icon",
+                                      height: 14,
+                                      width: 14,
+                                      iconColor: isFilterApplied
+                                          ? Colors.white
+                                          : ColorsRes.appColor,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Flexible(
+                                    child: CustomTextLabel(
+                                      jsonKey: "filter",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: isFilterApplied
+                                            ? ColorsRes.appColor
+                                            : ColorsRes.mainTextColor,
                                       ),
-                                      getSizedBox(height: 10),
-                                      Column(
-                                        children: List.generate(
-                                          ApiAndParams
-                                              .productListSortTypes.length,
-                                          (index) {
-                                            return GestureDetector(
-                                              onTap: () async {
-                                                Navigator.pop(context);
-                                                context
-                                                    .read<ProductListProvider>()
-                                                    .products = [];
-
-                                                context
-                                                    .read<ProductListProvider>()
-                                                    .offset = 0;
-
-                                                context
-                                                    .read<ProductListProvider>()
-                                                    .currentSortByOrderIndex = index;
-
-                                                callApi(isReset: true);
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    EdgeInsetsDirectional.all(
-                                                        10),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    context
-                                                                .read<
-                                                                    ProductListProvider>()
-                                                                .currentSortByOrderIndex ==
-                                                            index
-                                                        ? Icon(
-                                                            Icons
-                                                                .radio_button_checked,
-                                                            color: ColorsRes
-                                                                .appColor,
-                                                          )
-                                                        : Icon(
-                                                            Icons
-                                                                .radio_button_off,
-                                                            color: ColorsRes
-                                                                .appColor,
-                                                          ),
-                                                    getSizedBox(width: 10),
-                                                    Expanded(
-                                                      child: CustomTextLabel(
-                                                        jsonKey:
-                                                            lblSortingDisplayList[
-                                                                index],
-                                                        softWrap: true,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .titleMedium!
-                                                            .merge(
-                                                              TextStyle(
-                                                                letterSpacing:
-                                                                    0.5,
-                                                                fontSize: 16,
-                                                                color: ColorsRes
-                                                                    .mainTextColor,
-                                                              ),
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Filter count indicator
+                              if (isFilterApplied)
+                                Positioned(
+                                  right: 0,
+                                  top: -2,
+                                  child: Container(
+                                    padding: EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      color: ColorsRes.appColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 12,
+                                      minHeight: 12,
+                                    ),
+                                    child: Text(
+                                      '•',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 6,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                    ],
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsetsDirectional.only(start: 5, end: 5),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            defaultImg(
-                                image: "sorting_icon",
-                                height: 17,
-                                width: 17,
-                                padding: const EdgeInsetsDirectional.only(
-                                    top: 7, bottom: 7, end: 7),
-                                iconColor: Theme.of(context).primaryColor),
-                            CustomTextLabel(
-                              jsonKey: "sort_by",
-                              softWrap: true,
-                            )
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context
-                            .read<ProductChangeListingTypeProvider>()
-                            .changeListingType();
-                      },
-                      child: Container(
-                        margin: EdgeInsetsDirectional.only(start: 5, end: 10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            defaultImg(
-                                image: context
-                                            .watch<
-                                                ProductChangeListingTypeProvider>()
-                                            .getListingType() ==
-                                        false
-                                    ? "grid_view_icon"
-                                    : "list_view_icon",
-                                height: 17,
-                                width: 17,
-                                padding: const EdgeInsetsDirectional.only(
-                                    top: 7, bottom: 7, end: 7),
-                                iconColor: Theme.of(context).primaryColor),
-                            CustomTextLabel(
-                              text: context
-                                          .watch<
-                                              ProductChangeListingTypeProvider>()
-                                          .getListingType() ==
-                                      false
-                                  ? getTranslatedValue(
-                                      context,
-                                      "grid_view",
-                                    )
-                                  : getTranslatedValue(
-                                      context,
-                                      "list_view",
+
+                    // Divider
+                    Container(
+                      width: 0.5,
+                      height: 20,
+                      color: ColorsRes.subTitleMainTextColor
+                          .withValues(alpha: 0.15),
+                    ),
+
+                    // Enhanced Sort Button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (BuildContext context1) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Handle bar
+                                    Container(
+                                      width: 32,
+                                      height: 3,
+                                      decoration: BoxDecoration(
+                                        color: ColorsRes.subTitleMainTextColor
+                                            .withValues(alpha: 0.3),
+                                        borderRadius:
+                                            BorderRadius.circular(1.5),
+                                      ),
                                     ),
-                              softWrap: true,
-                            )
-                          ],
+                                    SizedBox(height: 16),
+
+                                    // Header
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: ColorsRes.appColor
+                                                .withValues(alpha: 0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          child: defaultImg(
+                                            image: "sorting_icon",
+                                            height: 16,
+                                            width: 16,
+                                            iconColor: ColorsRes.appColor,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: CustomTextLabel(
+                                            jsonKey: "sort_by",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: ColorsRes.mainTextColor,
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () => Navigator.pop(context),
+                                          child: Container(
+                                            padding: EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color: ColorsRes
+                                                  .subTitleMainTextColor
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: ColorsRes.mainTextColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    SizedBox(height: 20),
+
+                                    // Sort options
+                                    ...List.generate(
+                                      ApiAndParams.productListSortTypes.length,
+                                      (index) {
+                                        bool isSelected = context
+                                                .read<ProductListProvider>()
+                                                .currentSortByOrderIndex ==
+                                            index;
+
+                                        return GestureDetector(
+                                          onTap: () async {
+                                            Navigator.pop(context);
+                                            context
+                                                .read<ProductListProvider>()
+                                                .products = [];
+                                            context
+                                                .read<ProductListProvider>()
+                                                .offset = 0;
+                                            context
+                                                    .read<ProductListProvider>()
+                                                    .currentSortByOrderIndex =
+                                                index;
+                                            callApi(isReset: true);
+                                          },
+                                          child: Container(
+                                            margin: EdgeInsets.only(bottom: 6),
+                                            padding: EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? ColorsRes.appColor
+                                                      .withValues(alpha: 0.08)
+                                                  : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? ColorsRes.appColor
+                                                        .withValues(alpha: 0.2)
+                                                    : Colors.transparent,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 16,
+                                                  height: 16,
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected
+                                                        ? ColorsRes.appColor
+                                                        : Colors.transparent,
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: isSelected
+                                                          ? ColorsRes.appColor
+                                                          : ColorsRes
+                                                              .subTitleMainTextColor
+                                                              .withValues(
+                                                                  alpha: 0.4),
+                                                      width: 1.5,
+                                                    ),
+                                                  ),
+                                                  child: isSelected
+                                                      ? Icon(
+                                                          Icons.check,
+                                                          size: 10,
+                                                          color: Colors.white,
+                                                        )
+                                                      : null,
+                                                ),
+                                                SizedBox(width: 10),
+                                                Expanded(
+                                                  child: CustomTextLabel(
+                                                    jsonKey:
+                                                        lblSortingDisplayList[
+                                                            index],
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: isSelected
+                                                          ? FontWeight.w600
+                                                          : FontWeight.w400,
+                                                      color: isSelected
+                                                          ? ColorsRes.appColor
+                                                          : ColorsRes
+                                                              .mainTextColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+
+                                    SizedBox(height: 16),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      ColorsRes.appColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: defaultImg(
+                                  image: "sorting_icon",
+                                  height: 14,
+                                  width: 14,
+                                  iconColor: ColorsRes.appColor,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: CustomTextLabel(
+                                  jsonKey: "sort_by",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorsRes.mainTextColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+
+                    // Divider
+                    Container(
+                      width: 0.5,
+                      height: 20,
+                      color: ColorsRes.subTitleMainTextColor
+                          .withValues(alpha: 0.15),
+                    ),
+
+                    // Enhanced View Toggle Button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          context
+                              .read<ProductChangeListingTypeProvider>()
+                              .changeListingType();
+                        },
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      ColorsRes.appColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: defaultImg(
+                                  image: context
+                                              .watch<
+                                                  ProductChangeListingTypeProvider>()
+                                              .getListingType() ==
+                                          false
+                                      ? "grid_view_icon"
+                                      : "list_view_icon",
+                                  height: 14,
+                                  width: 14,
+                                  iconColor: ColorsRes.appColor,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: CustomTextLabel(
+                                  text: context
+                                              .watch<
+                                                  ProductChangeListingTypeProvider>()
+                                              .getListingType() ==
+                                          false
+                                      ? getTranslatedValue(context, "grid_view")
+                                      : getTranslatedValue(
+                                          context, "list_view"),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorsRes.mainTextColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Expanded(
                 child: setRefreshIndicator(
