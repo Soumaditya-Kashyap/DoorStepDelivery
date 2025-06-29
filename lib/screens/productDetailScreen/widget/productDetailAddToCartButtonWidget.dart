@@ -31,195 +31,210 @@ Widget ProductDetailAddToCartButtonWidget({
                       shape: DesignConfig.setRoundedBorderSpecific(20,
                           istop: true),
                       backgroundColor: Theme.of(context).cardColor,
-                      builder: (BuildContext context) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(20),
-                              topLeft: Radius.circular(20),
-                            ),
-                          ),
-                          padding: EdgeInsetsDirectional.only(
-                              start: Constant.size15,
-                              end: Constant.size15,
-                              top: Constant.size15,
-                              bottom: Constant.size15),
-                          child: Wrap(
-                            children: [
-                              Padding(
-                                padding: EdgeInsetsDirectional.only(
-                                    start: Constant.size15,
-                                    end: Constant.size15),
-                                child: Row(
-                                  children: [
-                                    ClipRRect(
-                                        borderRadius: Constant.borderRadius10,
-                                        clipBehavior:
-                                            Clip.antiAliasWithSaveLayer,
-                                        child: setNetworkImg(
-                                            boxFit: BoxFit.fill,
-                                            image: product.imageUrl,
-                                            height: 70,
-                                            width: 70)),
-                                    getSizedBox(width: Constant.size10),
-                                    Expanded(
-                                      child: CustomTextLabel(
-                                        text: product.name,
-                                        softWrap: true,
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: ColorsRes.mainTextColor,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
+                      builder: (BuildContext modalContext) {
+                        return ChangeNotifierProvider.value(
+                          value: selectedVariantItemProvider,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(modalContext).cardColor,
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                                topLeft: Radius.circular(20),
                               ),
-                              Container(
-                                padding: EdgeInsetsDirectional.only(
-                                    start: Constant.size15,
-                                    end: Constant.size15,
-                                    top: Constant.size15,
-                                    bottom: Constant.size15),
-                                child: ListView.separated(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: product.variants.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        context
-                                            .read<SelectedVariantItemProvider>()
-                                            .setSelectedIndex(index);
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: selectedVariantItemProvider
-                                                      .getSelectedIndex() ==
-                                                  index
-                                              ? ColorsRes.appColor
-                                                  .withValues(alpha: 0.1)
-                                              : Colors.transparent,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: selectedVariantItemProvider
-                                                        .getSelectedIndex() ==
-                                                    index
-                                                ? ColorsRes.appColor
-                                                : Colors.grey
-                                                    .withValues(alpha: 0.3),
-                                            width: selectedVariantItemProvider
-                                                        .getSelectedIndex() ==
-                                                    index
-                                                ? 2
-                                                : 1,
+                            ),
+                            padding: EdgeInsetsDirectional.only(
+                                start: Constant.size15,
+                                end: Constant.size15,
+                                top: Constant.size15,
+                                bottom: Constant.size15),
+                            child: Wrap(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.only(
+                                      start: Constant.size15,
+                                      end: Constant.size15),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                          borderRadius: Constant.borderRadius10,
+                                          clipBehavior:
+                                              Clip.antiAliasWithSaveLayer,
+                                          child: setNetworkImg(
+                                              boxFit: BoxFit.fill,
+                                              image: product.imageUrl,
+                                              height: 70,
+                                              width: 70)),
+                                      getSizedBox(width: Constant.size10),
+                                      Expanded(
+                                        child: CustomTextLabel(
+                                          text: product.name,
+                                          softWrap: true,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            color: ColorsRes.mainTextColor,
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Flexible(
-                                                        child: CustomTextLabel(
-                                                          text:
-                                                              "${product.variants[index].measurement} ${product.variants[index].stockUnitName}",
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: ColorsRes
-                                                                .mainTextColor,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 1,
-                                                        ),
-                                                      ),
-                                                      if (double.parse(product
-                                                              .variants[index]
-                                                              .discountedPrice) !=
-                                                          0) ...[
-                                                        SizedBox(width: 8),
-                                                        CustomTextLabel(
-                                                          text: product
-                                                              .variants[index]
-                                                              .price
-                                                              .currency,
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color:
-                                                                ColorsRes.grey,
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .lineThrough,
-                                                            decorationThickness:
-                                                                2,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 4),
-                                                  CustomTextLabel(
-                                                    text: double.parse(product
-                                                                .variants[index]
-                                                                .discountedPrice) !=
-                                                            0
-                                                        ? product
-                                                            .variants[index]
-                                                            .discountedPrice
-                                                            .currency
-                                                        : product
-                                                            .variants[index]
-                                                            .price
-                                                            .currency,
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      color: ColorsRes.appColor,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsetsDirectional.only(
+                                      start: Constant.size15,
+                                      end: Constant.size15,
+                                      top: Constant.size15,
+                                      bottom: Constant.size15),
+                                  child: Consumer<SelectedVariantItemProvider>(
+                                      builder: (context,
+                                          selectedVariantProvider, _) {
+                                    return ListView.separated(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: product.variants.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            selectedVariantProvider
+                                                .setSelectedIndex(index);
+                                            Navigator.pop(modalContext);
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: selectedVariantProvider
+                                                          .getSelectedIndex() ==
+                                                      index
+                                                  ? ColorsRes.appColor
+                                                      .withValues(alpha: 0.1)
+                                                  : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: selectedVariantProvider
+                                                            .getSelectedIndex() ==
+                                                        index
+                                                    ? ColorsRes.appColor
+                                                    : Colors.grey
+                                                        .withValues(alpha: 0.3),
+                                                width: selectedVariantProvider
+                                                            .getSelectedIndex() ==
+                                                        index
+                                                    ? 2
+                                                    : 1,
                                               ),
                                             ),
-                                            if (selectedVariantItemProvider
-                                                    .getSelectedIndex() ==
-                                                index)
-                                              Container(
-                                                padding: EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: ColorsRes.appColor,
-                                                  shape: BoxShape.circle,
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Flexible(
+                                                            child:
+                                                                CustomTextLabel(
+                                                              text:
+                                                                  "${product.variants[index].measurement} ${product.variants[index].stockUnitName}",
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: ColorsRes
+                                                                    .mainTextColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              maxLines: 1,
+                                                            ),
+                                                          ),
+                                                          if (double.parse(product
+                                                                  .variants[
+                                                                      index]
+                                                                  .discountedPrice) !=
+                                                              0) ...[
+                                                            SizedBox(width: 8),
+                                                            CustomTextLabel(
+                                                              text: product
+                                                                  .variants[
+                                                                      index]
+                                                                  .price
+                                                                  .currency,
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: ColorsRes
+                                                                    .grey,
+                                                                decoration:
+                                                                    TextDecoration
+                                                                        .lineThrough,
+                                                                decorationThickness:
+                                                                    2,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 4),
+                                                      CustomTextLabel(
+                                                        text: double.parse(product
+                                                                    .variants[
+                                                                        index]
+                                                                    .discountedPrice) !=
+                                                                0
+                                                            ? product
+                                                                .variants[index]
+                                                                .discountedPrice
+                                                                .currency
+                                                            : product
+                                                                .variants[index]
+                                                                .price
+                                                                .currency,
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                          color: ColorsRes
+                                                              .appColor,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                                child: Icon(
-                                                  Icons.check,
-                                                  color: Colors.white,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
+                                                if (selectedVariantProvider
+                                                        .getSelectedIndex() ==
+                                                    index)
+                                                  Container(
+                                                    padding: EdgeInsets.all(4),
+                                                    decoration: BoxDecoration(
+                                                      color: ColorsRes.appColor,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.check,
+                                                      color: Colors.white,
+                                                      size: 16,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder:
+                                          (BuildContext context, int index) {
+                                        return SizedBox(height: 8);
+                                      },
                                     );
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, int index) {
-                                    return SizedBox(height: 8);
-                                  },
+                                  }),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
