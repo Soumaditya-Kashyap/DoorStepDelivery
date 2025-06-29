@@ -9,6 +9,7 @@ class IntroSliderScreen extends StatefulWidget {
 
 class IntroSliderScreenState extends State<IntroSliderScreen> {
   int currentPosition = 0;
+  PageController pageController = PageController();
 
   /// Intro slider list ...
   /// You can add or remove items from below list as well
@@ -17,15 +18,27 @@ class IntroSliderScreenState extends State<IntroSliderScreen> {
 
   @override
   void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update system UI overlay style based on current theme
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        statusBarIconBrightness:
-            Constant.session.getBoolData(SessionManager.isDarkTheme)
-                ? Brightness.dark
-                : Brightness.light,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: Theme.of(context).brightness,
       ),
     );
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,252 +47,265 @@ class IntroSliderScreenState extends State<IntroSliderScreen> {
       {
         "image":
             "intro_slider_1${Constant.session.getBoolData(SessionManager.isDarkTheme) ? "_dark" : ""}",
-        "title": getTranslatedValue(context, "intro_title_1"),
-        "description": getTranslatedValue(context, "intro_description_1"),
+        "title": "Discover Fresh Finds",
+        "subtitle": "Fill Your Cart with Everything You Need.",
+        "description":
+            "Explore thousands of fresh products. Add your favorites to cart, checkout with ease, and let us handle the rest!",
       },
       {
         "image":
             "intro_slider_2${Constant.session.getBoolData(SessionManager.isDarkTheme) ? "_dark" : ""}",
-        "title": getTranslatedValue(context, "intro_title_2"),
-        "description": getTranslatedValue(context, "intro_description_2"),
+        "title": "Fast & Reliable Delivery",
+        "subtitle": "Right to Your Doorstep",
+        "description":
+            "Get your groceries delivered quickly and safely. We ensure freshness and quality in every order.",
       },
       {
         "image":
             "intro_slider_3${Constant.session.getBoolData(SessionManager.isDarkTheme) ? "_dark" : ""}",
-        "title": getTranslatedValue(context, "intro_title_3"),
-        "description": getTranslatedValue(context, "intro_description_3"),
+        "title": "Best Prices & Offers",
+        "subtitle": "Save More on Every Purchase",
+        "description":
+            "Enjoy exclusive deals, discounts, and cashback offers. Shop smart and save money on all your essentials.",
       },
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(top: Platform.isAndroid?false:true,
-        child: LayoutBuilder(builder: (context, constraints) {
-          return Column(
-            children: [
-              getSizedBox(height: constraints.maxHeight * 0.04),
-              dotWidget(),
-              getSizedBox(height: constraints.maxHeight * 0.04),
-              Padding(
-                padding: EdgeInsetsDirectional.only(start: 20, end: 20),
-                child: CustomTextLabel(
-                  text: introSlider[currentPosition]["title"],
-                  softWrap: true,
-                  style: TextStyle(
-                    color: ColorsRes.mainTextColor,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              getSizedBox(height: constraints.maxHeight * 0.02),
-              Padding(
-                padding: EdgeInsetsDirectional.only(start: 20, end: 20),
-                child: CustomTextLabel(
-                  text: introSlider[currentPosition]["description"],
-                  softWrap: true,
-                  style: TextStyle(
-                    color: ColorsRes.mainTextColor.withValues(alpha:0.76),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              getSizedBox(height: constraints.maxHeight * 0.04),
-              Expanded(
-                child: defaultImg(
-                  padding: EdgeInsetsDirectional.only(start: 20, end: 20),
-                  image: introSlider[currentPosition]["image"],
-                  height: constraints.maxHeight * 0.4,
-                ),
-              ),
-              if (currentPosition == 0)
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacementNamed(context, loginAccountScreen);
-                        },
-                        child: Container(
-                          height: 45,
-                          margin: EdgeInsetsDirectional.only(start: 20, end: 10),
-                          decoration: DesignConfig.boxDecoration(
-                            Theme.of(context).scaffoldBackgroundColor,
-                            10,
-                            bordercolor: ColorsRes.mainTextColor,
-                            borderwidth: 1,
-                            isboarder: true,
-                          ),
-                          child: Center(
-                            child: CustomTextLabel(
-                              jsonKey: "skip",
-                              style: TextStyle(
-                                color: ColorsRes.mainTextColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: Theme.of(context).brightness == Brightness.dark
+                ? [
+                    Color(0xFF1A1A1A),
+                    Color(0xFF2D2D2D),
+                    Color(0xFF3A3A3A),
+                  ]
+                : [
+                    Color(0xFFFFF5F5),
+                    Color(0xFFFEEBEB),
+                    Color(0xFFFDE2E2),
+                  ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(builder: (context, constraints) {
+            return Column(
+              children: [
+                // Skip button
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: 50), // For balance
+                      // Page indicator dots
+                      Row(
+                        children: List.generate(
+                          introSlider.length,
+                          (index) => Container(
+                            margin: EdgeInsets.symmetric(horizontal: 3),
+                            width: currentPosition == index ? 20 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: currentPosition == index
+                                  ? ColorsRes.appColor
+                                  : (Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? ColorsRes.appColor
+                                          .withValues(alpha: 0.4)
+                                      : Color(0xFFFFB3B3)),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
+                      // Skip button
+                      GestureDetector(
                         onTap: () {
-                          currentPosition++;
-                          setState(() {});
+                          Navigator.pushReplacementNamed(
+                              context, loginAccountScreen);
                         },
-                        child: Container(
-                          height: 45,
-                          margin: EdgeInsetsDirectional.only(start: 10, end: 20),
-                          decoration:
-                              DesignConfig.boxDecoration(ColorsRes.appColor, 10),
-                          child: Row(
-                            children: [
-                              getSizedBox(width: 20),
-                              Spacer(),
-                              CustomTextLabel(
-                                jsonKey: "next",
-                                style: TextStyle(
-                                  color: ColorsRes.appColorWhite,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Spacer(),
-                              defaultImg(
-                                image: "ic_arrow_forward",
-                                iconColor: ColorsRes.appColorWhite,
-                              ),
-                              getSizedBox(width: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              if (currentPosition == 1)
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          currentPosition--;
-                          setState(() {});
-                        },
-                        child: Container(
-                          height: 45,
-                          margin: EdgeInsetsDirectional.only(start: 20, end: 10),
-                          decoration: DesignConfig.boxDecoration(
-                            Theme.of(context).scaffoldBackgroundColor,
-                            10,
-                            bordercolor: ColorsRes.mainTextColor,
-                            borderwidth: 1,
-                            isboarder: true,
-                          ),
-                          child: Center(
-                            child: CustomTextLabel(
-                              jsonKey: "back",
-                              style: TextStyle(
-                                color: ColorsRes.mainTextColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          currentPosition++;
-                          setState(() {});
-                        },
-                        child: Container(
-                          height: 45,
-                          margin: EdgeInsetsDirectional.only(start: 10, end: 20),
-                          decoration:
-                              DesignConfig.boxDecoration(ColorsRes.appColor, 10),
-                          child: Row(
-                            children: [
-                              getSizedBox(width: 20),
-                              Spacer(),
-                              CustomTextLabel(
-                                jsonKey: "next",
-                                style: TextStyle(
-                                  color: ColorsRes.appColorWhite,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Spacer(),
-                              defaultImg(
-                                image: "ic_arrow_forward",
-                                iconColor: ColorsRes.appColorWhite,
-                              ),
-                              getSizedBox(width: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              if (currentPosition == introSlider.length - 1)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, loginAccountScreen);
-                  },
-                  child: Container(
-                    height: 45,
-                    margin: EdgeInsetsDirectional.only(start: 10, end: 10),
-                    decoration:
-                        DesignConfig.boxDecoration(ColorsRes.appColor, 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomTextLabel(
-                          jsonKey: "get_started",
+                        child: Text(
+                          "Skip",
                           style: TextStyle(
-                            color: ColorsRes.appColorWhite,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? ColorsRes.mainTextColor
+                                    : Color(0xFF666666),
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                getSizedBox(height: constraints.maxHeight * 0.08),
+
+                // Main content
+                Expanded(
+                  child: PageView.builder(
+                    controller: pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        currentPosition = index;
+                      });
+                    },
+                    itemCount: introSlider.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            // Image/Illustration
+                            Container(
+                              height: constraints.maxHeight * 0.35,
+                              width: double.infinity,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Color(0xFF404040)
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(150),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? ColorsRes.appColor
+                                              : Color(0xFFFF6B6B))
+                                          .withValues(alpha: 0.1),
+                                      blurRadius: 30,
+                                      offset: Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: defaultImg(
+                                    image: introSlider[index]["image"],
+                                    height: constraints.maxHeight * 0.25,
+                                    width: constraints.maxHeight * 0.25,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            getSizedBox(height: constraints.maxHeight * 0.06),
+
+                            // Title
+                            Text(
+                              introSlider[index]["title"],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: ColorsRes.mainTextColor,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
+                              ),
+                            ),
+
+                            getSizedBox(height: constraints.maxHeight * 0.02),
+
+                            // Subtitle
+                            Text(
+                              introSlider[index]["subtitle"],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: ColorsRes.mainTextColor,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                              ),
+                            ),
+
+                            getSizedBox(height: constraints.maxHeight * 0.03),
+
+                            // Description
+                            Text(
+                              introSlider[index]["description"],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: ColorsRes.subTitleMainTextColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                height: 1.5,
+                              ),
+                            ),
+
+                            Spacer(),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                // Bottom button
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                  child: GestureDetector(
+                    onTap: () {
+                      if (currentPosition < introSlider.length - 1) {
+                        pageController.nextPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      } else {
+                        Navigator.pushReplacementNamed(
+                            context, loginAccountScreen);
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            ColorsRes.appColor,
+                            ColorsRes.appColor.withValues(alpha: 0.8)
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorsRes.appColor.withValues(alpha: 0.3),
+                            blurRadius: 15,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            currentPosition < introSlider.length - 1
+                                ? "Continue"
+                                : "Get Started",
+                            style: TextStyle(
+                              color: ColorsRes.appColorWhite,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: ColorsRes.appColorWhite,
+                            size: 20,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              getSizedBox(height: 20),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-
-  dotWidget() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        introSlider.length,
-        (index) {
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 600),
-            margin: const EdgeInsetsDirectional.only(start: 5, end: 5),
-            width: (context.width - 40) / introSlider.length,
-            height: 5,
-            decoration: DesignConfig.boxDecoration(
-              currentPosition >= index
-                  ? ColorsRes.appColor
-                  : ColorsRes.subTitleMainTextColor,
-              10,
-            ),
-          );
-        },
+              ],
+            );
+          }),
+        ),
       ),
     );
   }
