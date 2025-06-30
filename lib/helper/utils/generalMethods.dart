@@ -101,11 +101,18 @@ Future sendApiRequest(
 
     http.Response response;
     if (isPost) {
-      response = await http.post(Uri.parse(mainUrl), body: params.isNotEmpty ? params : null, headers: headersData);
+      response = await http.post(
+        Uri.parse(mainUrl), 
+        body: params.isNotEmpty ? params : null, 
+        headers: headersData
+      ).timeout(Duration(seconds: 30)); // 30 second timeout for POST requests
     } else {
       mainUrl = await Constant.getGetMethodUrlWithParams(apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName", params);
 
-      response = await http.get(Uri.parse(mainUrl), headers: headersData);
+      response = await http.get(
+        Uri.parse(mainUrl), 
+        headers: headersData
+      ).timeout(Duration(seconds: 20)); // 20 second timeout for GET requests
     }
 
     if (kDebugMode) {
@@ -833,8 +840,11 @@ Future<void> signOut(
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    final client = super.createHttpClient(context);
+    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    client.connectionTimeout = Duration(seconds: 15); // Connection timeout
+    client.idleTimeout = Duration(seconds: 15); // Idle timeout
+    return client;
   }
 }
 

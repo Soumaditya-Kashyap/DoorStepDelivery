@@ -109,6 +109,12 @@ Widget setNetworkImg({
                 _buildErrorPlaceholder(height, width, borderRadius),
             fadeInDuration: Duration(milliseconds: 300),
             fadeOutDuration: Duration(milliseconds: 100),
+            // Add cache options for better performance
+            maxHeightDiskCache: 1000,
+            maxWidthDiskCache: 1000,
+            // Custom cache options
+            cacheKey: image,
+            useOldImageOnUrlChange: true,
           ),
         );
 }

@@ -9,6 +9,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+  // Set custom HTTP overrides for better network handling
+  HttpOverrides.global = MyHttpOverrides();
 
   // Initialize Firebase
   await Firebase.initializeApp();

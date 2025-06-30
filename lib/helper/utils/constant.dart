@@ -6,8 +6,8 @@ enum ThemeList { systemDefault, light, dark }
 
 class Constant {
   // ADMIN PANEL URL
-  static String hostUrl = "https://egrocer.wrteam.me/";
-  // static String hostUrl = "https://purnima.xamtechinnovation.com/";
+  //static String hostUrl = "https://egrocer.wrteam.me/";
+   static String hostUrl = "https://purnima.xamtechinnovation.com/";
 
   // WEBSITE URL
   static String websiteUrl = "https://grocery.xamtechinnovation.com/";
@@ -70,7 +70,7 @@ class Constant {
   static String authTypeGoogleLogin = "0";
   static String authTypeAppleLogin = "0";
   static String authTypeEmailLogin = "0";
-  static String customSmsGatewayOtpBased = "0";
+  static String customSmsGatewayOtpBased = "1";
   static String firebaseAuthentication = "0";
 
 //Order statues codes

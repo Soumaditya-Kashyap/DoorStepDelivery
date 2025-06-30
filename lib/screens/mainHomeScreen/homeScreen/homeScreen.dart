@@ -62,6 +62,32 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Safe image precaching with timeout and error handling
+  Future<void> _safePrecacheImage(String imageUrl, BuildContext context) async {
+    if (imageUrl.trim().isEmpty || !mounted) return;
+
+    try {
+      // Add timeout to prevent hanging requests
+      await precacheImage(
+        NetworkImage(imageUrl),
+        context,
+      ).timeout(
+        Duration(seconds: 10), // 10 second timeout
+        onTimeout: () {
+          // Handle timeout gracefully
+          if (kDebugMode) {
+            print('Image precache timeout for: $imageUrl');
+          }
+        },
+      );
+    } catch (e) {
+      // Handle any network or image loading errors silently
+      if (kDebugMode) {
+        print('Image precache error for: $imageUrl - Error: $e');
+      }
+    }
+  }
+
   scrollListener() async {
     // nextPageTrigger will have a value equivalent to 70% of the list size.
     var nextPageTrigger =
@@ -138,15 +164,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           map = homeScreenProvider.homeOfferImagesMap;
                           if (homeScreenProvider.homeScreenState ==
                               HomeScreenState.loaded) {
+                            // Safely precache slider images with error handling
                             for (int i = 0;
                                 i <
                                     homeScreenProvider
                                         .homeScreenData.sliders!.length;
                                 i++) {
-                              precacheImage(
-                                NetworkImage(homeScreenProvider
+                              _safePrecacheImage(
+                                homeScreenProvider
                                         .homeScreenData.sliders?[i].imageUrl ??
-                                    ""),
+                                    "",
                                 context,
                               );
                             }
