@@ -161,7 +161,7 @@ class OrderBillingDetailsWidget extends StatelessWidget {
                       ),
                       const Spacer(),
                       CustomTextLabel(
-                        text: "-${order.walletBalance?.currency}",
+                        text: "-${(order.walletBalance ?? "0").currency}",
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           color: ColorsRes.mainTextColor,

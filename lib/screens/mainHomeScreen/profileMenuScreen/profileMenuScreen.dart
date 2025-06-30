@@ -150,6 +150,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "label": "my_wallet",
           "value": Consumer<SessionManager>(
             builder: (context, sessionManager, child) {
+              String walletBalance =
+                  sessionManager.getData(SessionManager.keyWalletBalance);
+              // Ensure wallet balance is a valid number string
+              if (walletBalance.isEmpty || walletBalance == "null") {
+                walletBalance = "0";
+              }
+
               return Container(
                 padding: EdgeInsetsDirectional.symmetric(
                   horizontal: 16,
@@ -178,9 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     getSizedBox(width: 8),
                     CustomTextLabel(
-                      text:
-                          "${sessionManager.getData(SessionManager.keyWalletBalance)}"
-                              .currency,
+                      text: walletBalance.currency,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10,
@@ -532,7 +537,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           menuItem[index]['value'],
                           getSizedBox(width: 12),
                         ],
-                        
+
                         // Arrow button with modern design
                         Container(
                           width: 36,
@@ -561,9 +566,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             },
           ),
-          if (title.isNotEmpty)
-            getSizedBox(
-                height: 4), 
+          if (title.isNotEmpty) getSizedBox(height: 4),
         ],
       ),
     );

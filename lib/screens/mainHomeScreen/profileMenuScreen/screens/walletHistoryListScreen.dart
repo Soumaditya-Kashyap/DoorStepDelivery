@@ -107,10 +107,16 @@ class _WalletHistoryListScreenState extends State<WalletHistoryListScreen> {
                         ),
                         Consumer<SessionManager>(
                           builder: (context, sessionManager, child) {
+                            String walletBalance = sessionManager
+                                .getData(SessionManager.keyWalletBalance);
+                            // Ensure wallet balance is a valid number string
+                            if (walletBalance.isEmpty ||
+                                walletBalance == "null") {
+                              walletBalance = "0";
+                            }
+
                             return CustomTextLabel(
-                              text:
-                                  "${sessionManager.getData(SessionManager.keyWalletBalance)}"
-                                      .currency,
+                              text: walletBalance.currency,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: ColorsRes.appColor,
@@ -243,8 +249,8 @@ class _WalletHistoryListScreenState extends State<WalletHistoryListScreen> {
                     vertical: Constant.size5, horizontal: Constant.size10),
                 decoration: DesignConfig.boxDecoration(
                   walletHistory.type?.toLowerCase() == "credit"
-                      ? ColorsRes.appColorGreen.withValues(alpha:0.1)
-                      : ColorsRes.appColorRed.withValues(alpha:0.1),
+                      ? ColorsRes.appColorGreen.withValues(alpha: 0.1)
+                      : ColorsRes.appColorRed.withValues(alpha: 0.1),
                   5,
                   bordercolor: walletHistory.type?.toLowerCase() == "credit"
                       ? ColorsRes.appColorGreen
@@ -315,7 +321,7 @@ class _WalletHistoryListScreenState extends State<WalletHistoryListScreen> {
                 softWrap: true,
               ),
               CustomTextLabel(
-                text: walletHistory.amount?.currency,
+                text: (walletHistory.amount ?? "0").currency,
                 style: TextStyle(
                     fontWeight: FontWeight.bold, color: ColorsRes.appColor),
                 softWrap: true,

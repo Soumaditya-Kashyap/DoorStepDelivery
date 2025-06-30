@@ -9,6 +9,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+  // Set up global error handling for FormatExceptions
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (details.exception is FormatException) {
+      print('Caught FormatException: ${details.exception}');
+      print('Stack trace: ${details.stack}');
+      // Don't crash the app for FormatExceptions
+      return;
+    }
+    // For other errors, use the default handler
+    FlutterError.presentError(details);
+  };
+
   // Set custom HTTP overrides for better network handling
   HttpOverrides.global = MyHttpOverrides();
 

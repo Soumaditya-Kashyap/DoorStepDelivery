@@ -80,7 +80,9 @@ class UserProfileProvider extends ChangeNotifier {
     return returnValue;
   }
 
-  Future<int?> loginApi({required BuildContext context, required Map<String, String> params}) async {
+  Future<int?> loginApi(
+      {required BuildContext context,
+      required Map<String, String> params}) async {
     int status = 0;
     //status = 0//error
     //sttaus = 1//verify use successfull
@@ -88,7 +90,8 @@ class UserProfileProvider extends ChangeNotifier {
     //status = 3//user_exist_password_blank
     try {
       UserProfile? userProfile;
-      await getLoginApi(context: context, params: params).then((mainData) async {
+      await getLoginApi(context: context, params: params)
+          .then((mainData) async {
         userProfile = UserProfile.fromJson(mainData);
         if (mainData[ApiAndParams.status].toString() == "1") {
           if (userProfile?.data != null) {
@@ -103,13 +106,24 @@ class UserProfileProvider extends ChangeNotifier {
           if (mainData[ApiAndParams.message].toString() == "user_deactivated") {
             status = 5;
           }
-        } else if (mainData[ApiAndParams.message].toString() == "email_not_verified") {
-          showMessage(context, getTranslatedValue(context, mainData[ApiAndParams.message].toString()), MessageType.warning);
+        } else if (mainData[ApiAndParams.message].toString() ==
+            "email_not_verified") {
+          showMessage(
+              context,
+              getTranslatedValue(
+                  context, mainData[ApiAndParams.message].toString()),
+              MessageType.warning);
           status = 2;
-        } else if (mainData[ApiAndParams.message].toString() == "user_exist_password_blank") {
+        } else if (mainData[ApiAndParams.message].toString() ==
+            "user_exist_password_blank") {
           status = 3;
-        } else if (mainData[ApiAndParams.message].toString() == "invalid_password") {
-          showMessage(context, getTranslatedValue(context, mainData[ApiAndParams.message].toString()), MessageType.warning);
+        } else if (mainData[ApiAndParams.message].toString() ==
+            "invalid_password") {
+          showMessage(
+              context,
+              getTranslatedValue(
+                  context, mainData[ApiAndParams.message].toString()),
+              MessageType.warning);
           status = 4;
         } else {
           status = 0;
@@ -148,9 +162,12 @@ class UserProfileProvider extends ChangeNotifier {
     }
   }
 
-  Future verifyUserExistProvider({required BuildContext context, required Map<String, String> params}) async {
+  Future verifyUserExistProvider(
+      {required BuildContext context,
+      required Map<String, String> params}) async {
     try {
-      Map<String, dynamic> data = await getVerifyUserExistApi(context: context, params: params);
+      Map<String, dynamic> data =
+          await getVerifyUserExistApi(context: context, params: params);
 
       return data;
     } catch (e) {
@@ -158,9 +175,12 @@ class UserProfileProvider extends ChangeNotifier {
     }
   }
 
-  Future changePasswordProvider({required BuildContext context, required Map<String, String> params}) async {
+  Future changePasswordProvider(
+      {required BuildContext context,
+      required Map<String, String> params}) async {
     try {
-      Map<String, dynamic> data = await changePasswordApi(context: context, params: params);
+      Map<String, dynamic> data =
+          await changePasswordApi(context: context, params: params);
 
       return data;
     } catch (e) {
@@ -183,12 +203,12 @@ class UserProfileProvider extends ChangeNotifier {
           status = "1";
           profileState = ProfileState.loaded;
           notifyListeners();
-        }
-        else {
+        } else {
           UserProfile userProfile = UserProfile.fromJson(mainData);
           if (mainData[ApiAndParams.message].toString() == "success") {
-            await setUserDataInSession(mainData, context).then((value){
-              Navigator.of(context).pushNamedAndRemoveUntil(mainHomeScreen, (Route<dynamic> route) => false);
+            await setUserDataInSession(mainData, context).then((value) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  mainHomeScreen, (Route<dynamic> route) => false);
             });
           }
           if (userProfile.status.toString() == "1") {
@@ -215,15 +235,17 @@ class UserProfileProvider extends ChangeNotifier {
         if (mainData[ApiAndParams.message].toString() == "user_already_exist") {
           showMessage(
             context,
-            getTranslatedValue(context, getTranslatedValue(context, mainData[ApiAndParams.message])),
+            getTranslatedValue(context,
+                getTranslatedValue(context, mainData[ApiAndParams.message])),
             MessageType.warning,
           );
-        }else{
-        showMessage(
-          context,
-          getTranslatedValue(context, getTranslatedValue(context, mainData[ApiAndParams.message])),
-          MessageType.warning,
-        );
+        } else {
+          showMessage(
+            context,
+            getTranslatedValue(context,
+                getTranslatedValue(context, mainData[ApiAndParams.message])),
+            MessageType.warning,
+          );
         }
         profileState = ProfileState.loaded;
         notifyListeners();
@@ -312,9 +334,21 @@ class UserProfileProvider extends ChangeNotifier {
   }
 
   getUserDetailBySessionKey({required bool isBool, required String key}) {
-    return isBool == true
-        ? Constant.session.getBoolData(key)
-        : Constant.session.getData(key);
+    try {
+      if (isBool == true) {
+        return Constant.session.getBoolData(key);
+      } else {
+        String value = Constant.session.getData(key);
+        // Return empty string if value is null-like
+        if (value == "null" || value.isEmpty) {
+          return "";
+        }
+        return value;
+      }
+    } catch (e) {
+      print('Error getting user detail by session key: $e');
+      return isBool ? false : "";
+    }
   }
 
   changeState() {

@@ -91,32 +91,36 @@ Future sendApiRequest(
     }
 
     headersData["x-access-key"] = "903361";
-    
+
     // Remove email if type is phone and email is empty
-    if (params["type"] == "phone" && (params["email"] == null || params["email"] == "")) {
+    if (params["type"] == "phone" &&
+        (params["email"] == null || params["email"] == "")) {
       params.remove("email");
     }
 
-    String mainUrl = apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName";
+    String mainUrl =
+        apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName";
 
     http.Response response;
     if (isPost) {
-      response = await http.post(
-        Uri.parse(mainUrl), 
-        body: params.isNotEmpty ? params : null, 
-        headers: headersData
-      ).timeout(Duration(seconds: 30)); // 30 second timeout for POST requests
+      response = await http
+          .post(Uri.parse(mainUrl),
+              body: params.isNotEmpty ? params : null, headers: headersData)
+          .timeout(
+              Duration(seconds: 30)); // 30 second timeout for POST requests
     } else {
-      mainUrl = await Constant.getGetMethodUrlWithParams(apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName", params);
+      mainUrl = await Constant.getGetMethodUrlWithParams(
+          apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName",
+          params);
 
-      response = await http.get(
-        Uri.parse(mainUrl), 
-        headers: headersData
-      ).timeout(Duration(seconds: 20)); // 20 second timeout for GET requests
+      response = await http
+          .get(Uri.parse(mainUrl), headers: headersData)
+          .timeout(Duration(seconds: 20)); // 20 second timeout for GET requests
     }
 
     if (kDebugMode) {
-      debugPrint("API IS ${"$mainUrl,{$params}, ${(isRequestedForInvoice == true) ? "" : response.body}"}");
+      debugPrint(
+          "API IS ${"$mainUrl,{$params}, ${(isRequestedForInvoice == true) ? "" : response.body}"}");
     }
 
     if (response.statusCode == 200) {
@@ -139,7 +143,8 @@ Future sendApiRequest(
       // return isRequestedForInvoice == true ? response.bodyBytes : response.body;
     } else {
       if (kDebugMode) {
-        print("ERROR IS ${"$mainUrl,{$params},Status Code - ${response.statusCode}, ${(isRequestedForInvoice == true) ? "" : response.body}"}");
+        print(
+            "ERROR IS ${"$mainUrl,{$params},Status Code - ${response.statusCode}, ${(isRequestedForInvoice == true) ? "" : response.body}"}");
         showMessage(
           context,
           "$mainUrl,{$params},Status Code - ${response.statusCode}",
@@ -542,8 +547,11 @@ Future<PermissionStatus> hasCameraPermissionGiven(BuildContext context) async {
     }
 
     if (status.isPermanentlyDenied) {
-      showMessage(context, "Camera permission is permanently denied. Please enable it from settings.", MessageType.error);
-      openAppSettings();  // Open settings to allow the user to change permissions
+      showMessage(
+          context,
+          "Camera permission is permanently denied. Please enable it from settings.",
+          MessageType.error);
+      openAppSettings(); // Open settings to allow the user to change permissions
       return status;
     }
 
@@ -683,8 +691,7 @@ double calculateDiscountPercentage(
   return ((originalPrice - discount / originalPrice) * 100).toPrecision(2);
 }
 
-Future<Map<String, String>> setFilterParams(
-    Map<String, String> params) async {
+Future<Map<String, String>> setFilterParams(Map<String, String> params) async {
   try {
     params[ApiAndParams.totalMaxPrice] =
         Constant.currentRangeValues.end.toString();
@@ -695,8 +702,7 @@ Future<Map<String, String>> setFilterParams(
 
     List<String> sizes = await getSizeListSizesAndIds(Constant.selectedSizes)
         .then((value) => value[0]);
-    List<String> unitIds =
-    await getSizeListSizesAndIds(Constant.selectedSizes)
+    List<String> unitIds = await getSizeListSizesAndIds(Constant.selectedSizes)
         .then((value) => value[1]);
 
     List<String> categories = Constant.selectedCategories;
@@ -734,6 +740,7 @@ String getFiltersItemsList(List<String> param) {
   }
   return ids;
 }
+
 void loginUserAccount(BuildContext buildContext, String from) {
   showDialog<String>(
     context: buildContext,
@@ -755,7 +762,8 @@ void loginUserAccount(BuildContext buildContext, String from) {
         TextButton(
           onPressed: () async {
             Navigator.pop(context);
-            Navigator.pushNamed(context, loginAccountScreen, arguments: "add_to_cart");
+            Navigator.pushNamed(context, loginAccountScreen,
+                arguments: "add_to_cart");
           },
           child: CustomTextLabel(
             jsonKey: "ok",
@@ -841,7 +849,8 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     final client = super.createHttpClient(context);
-    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
     client.connectionTimeout = Duration(seconds: 15); // Connection timeout
     client.idleTimeout = Duration(seconds: 15); // Idle timeout
     return client;
@@ -859,18 +868,62 @@ String decodeBase64(String base64String) {
 ///EXTENSIONS STARTS FROM HERE
 
 extension CurrencyConverter on String {
-  String get currency => NumberFormat.currency(
-          locale: Platform.localeName,
-          symbol: Constant.currency,
-          decimalDigits: int.parse(Constant.decimalPoints.toString()),
-          name: Constant.currencyCode)
-      .format(this.toDouble);
+  String get currency {
+    try {
+      // Safely parse decimal points with fallback
+      int decimalDigits = 2; // Default fallback
+      try {
+        String decimalPointsStr = Constant.decimalPoints.toString();
+        if (decimalPointsStr.isNotEmpty && decimalPointsStr != "null") {
+          decimalDigits = int.parse(decimalPointsStr);
+        }
+      } catch (e) {
+        print('Error parsing decimal points: $e, using default: 2');
+        decimalDigits = 2;
+      }
 
-  double get toDouble =>
-      double.tryParse(double.tryParse(this)?.toStringAsFixed(2) ?? "0.00") ??
-      0.0;
+      // Ensure decimalDigits is within reasonable bounds
+      if (decimalDigits < 0 || decimalDigits > 10) {
+        decimalDigits = 2;
+      }
 
-  int get toInt => int.tryParse(this) ?? 0;
+      return NumberFormat.currency(
+              locale: Platform.localeName,
+              symbol: Constant.currency.isNotEmpty ? Constant.currency : '\$',
+              decimalDigits: decimalDigits,
+              name: Constant.currencyCode.isNotEmpty
+                  ? Constant.currencyCode
+                  : 'USD')
+          .format(this.toDouble);
+    } catch (e) {
+      // Fallback formatting if NumberFormat fails
+      print('Currency formatting error for value "$this": $e');
+      String symbol = Constant.currency.isNotEmpty ? Constant.currency : '\$';
+      return '$symbol${this.toDouble.toStringAsFixed(2)}';
+    }
+  }
+
+  double get toDouble {
+    try {
+      if (this.isEmpty || this == "null") return 0.0;
+      return double.tryParse(
+              double.tryParse(this)?.toStringAsFixed(2) ?? "0.00") ??
+          0.0;
+    } catch (e) {
+      print('String to double conversion error for "$this": $e');
+      return 0.0;
+    }
+  }
+
+  int get toInt {
+    try {
+      if (this.isEmpty || this == "null") return 0;
+      return int.tryParse(this) ?? 0;
+    } catch (e) {
+      print('String to int conversion error for "$this": $e');
+      return 0;
+    }
+  }
 }
 
 extension StringToDateTimeFormatting on String {

@@ -1,6 +1,7 @@
 import 'package:image_picker_platform_interface/src/types/image_source.dart'
     as ip;
 import 'package:project/helper/utils/generalImports.dart';
+import 'dart:io';
 
 class EditProfile extends StatefulWidget {
   final String? from;
@@ -1313,38 +1314,69 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> cropImage(String filePath) async {
-    await ImageCropper().cropImage(
-      sourcePath: filePath,
-      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-      compressQuality: 50,
-      compressFormat: ImageCompressFormat.png,
-      maxHeight: 512,
-      maxWidth: 512,
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarColor: Theme.of(context).cardColor,
-          toolbarWidgetColor: ColorsRes.mainTextColor,
-          initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          activeControlsWidgetColor: ColorsRes.appColor,
+    // Try custom cropper first, fallback to standard if needed
+    try {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: filePath,
+        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressQuality: 50,
+        compressFormat: ImageCompressFormat.png,
+        maxHeight: 512,
+        maxWidth: 512,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: "Edit Photo",
+            toolbarColor: ColorsRes.appColor,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            activeControlsWidgetColor: ColorsRes.appColor,
+            statusBarColor: ColorsRes.appColor,
+            cropFrameColor: ColorsRes.appColor,
+            cropGridColor: ColorsRes.appColor.withOpacity(0.5),
+            dimmedLayerColor: Colors.black.withOpacity(0.6),
+            showCropGrid: true,
+            hideBottomControls: false, // Keep controls visible at bottom
+            cropFrameStrokeWidth: 3,
+            cropGridStrokeWidth: 1,
+          ),
+          IOSUiSettings(
+            title: "Edit Photo",
+            doneButtonTitle: "Done",
+            cancelButtonTitle: "Cancel",
+            minimumAspectRatio: 1.0,
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+            aspectRatioPickerButtonHidden: true,
+            rotateButtonsHidden: false,
+            resetButtonHidden: true,
+            hidesNavigationBar: false,
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        selectedImagePath = croppedFile.path;
+        setState(() {});
+      }
+    } catch (e) {
+      // Fallback: Show custom cropping interface with better button positioning
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CustomImageCropperScreen(
+            imagePath: filePath,
+            onCropComplete: (croppedPath) {
+              if (croppedPath != null) {
+                selectedImagePath = croppedPath;
+                setState(() {});
+              }
+            },
+          ),
         ),
-        IOSUiSettings(
-          minimumAspectRatio: 1.0,
-          aspectRatioPickerButtonHidden: false,
-          aspectRatioLockDimensionSwapEnabled: true,
-          aspectRatioLockEnabled: true,
-          resetAspectRatioEnabled: true,
-        ),
-      ],
-    ).then(
-      (croppedFile) {
-        if (croppedFile != null) {
-          selectedImagePath = croppedFile.path;
-          setState(() {});
-        }
-      },
-    );
+      );
+    }
   }
 
   @override
@@ -1353,5 +1385,208 @@ class _EditProfileState extends State<EditProfile> {
     editEmailTextEditingController.dispose();
     editMobileTextEditingController.dispose();
     super.dispose();
+  }
+}
+
+// Custom Image Cropper Screen with better UI control
+class CustomImageCropperScreen extends StatefulWidget {
+  final String imagePath;
+  final Function(String?) onCropComplete;
+
+  const CustomImageCropperScreen({
+    Key? key,
+    required this.imagePath,
+    required this.onCropComplete,
+  }) : super(key: key);
+
+  @override
+  State<CustomImageCropperScreen> createState() =>
+      _CustomImageCropperScreenState();
+}
+
+class _CustomImageCropperScreenState extends State<CustomImageCropperScreen> {
+  bool isLoading = false;
+
+  Future<void> _cropImage() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: widget.imagePath,
+        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressQuality: 50,
+        compressFormat: ImageCompressFormat.png,
+        maxHeight: 512,
+        maxWidth: 512,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: "Edit Photo",
+            toolbarColor: ColorsRes.appColor,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            activeControlsWidgetColor: ColorsRes.appColor,
+            statusBarColor: ColorsRes.appColor,
+            cropFrameColor: ColorsRes.appColor,
+            cropGridColor: ColorsRes.appColor.withOpacity(0.5),
+            dimmedLayerColor: Colors.black.withOpacity(0.6),
+            showCropGrid: true,
+            hideBottomControls: false,
+            cropFrameStrokeWidth: 3,
+            cropGridStrokeWidth: 1,
+          ),
+          IOSUiSettings(
+            title: "Edit Photo",
+            doneButtonTitle: "Done",
+            cancelButtonTitle: "Cancel",
+            minimumAspectRatio: 1.0,
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+            aspectRatioPickerButtonHidden: true,
+            rotateButtonsHidden: false,
+            resetButtonHidden: true,
+            hidesNavigationBar: false,
+          ),
+        ],
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+
+      Navigator.of(context).pop();
+      widget.onCropComplete(croppedFile?.path);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Navigator.of(context).pop();
+      widget.onCropComplete(null);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: ColorsRes.appColor,
+        elevation: 0,
+        title: Text(
+          "Edit Photo",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+            widget.onCropComplete(null);
+          },
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  File(widget.imagePath),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+          // Bottom action buttons - properly positioned and accessible
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              Navigator.of(context).pop();
+                              widget.onCropComplete(null);
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black87,
+                        elevation: 0,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _cropImage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorsRes.appColor,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text(
+                              "Crop & Save",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
